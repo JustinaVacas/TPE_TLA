@@ -16,8 +16,10 @@ variable  		[a-zA-Z0-9]+
 "es"			        { return ASSIGN; }
 "traducir"				{ return TRANSLATE; }
 "print"					{ return PRINT; }
+"print_b"				{ return PRINT_B; }
 "dividir_en"			{ return DIVIDE_ASSIGN; }
 "contraer"				{ return CONTRACTION; }
+"si"					{ return IF; }
 
 {intnumber}        		{ strcpy(yylval.buffer, yytext); return INT; }
 {variable}    			{ strcpy(yylval.buffer, yytext); return VARIABLE; }
@@ -75,6 +77,10 @@ print aux --> 124.24.1246.2345.1
 texto aux es joji
 texto aux dividir_en 2
 print aux --> jo ji
+
+5- IF ------------------------------------------------------
+
+si aux traducir
 
 */
 
