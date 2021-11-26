@@ -17,8 +17,10 @@ typedef struct defined_variable{
     int defined;
 } defined_variable;
 
+
 char *reduce_string_node(node_t *node);
 char *reduce_variable_node(node_t *node);
+char *reduce_print_node(node_t *node);
 static char *eval(node_t *node);
 char *generate_code(node_t *node);
 

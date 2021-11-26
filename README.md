@@ -15,7 +15,7 @@ Autómatas, teoría de lenguajes y compiladores
 chmod +x ./install.sh
 ./install.sh
 chmod +x ./compile.sh
-./compile.sh file.braille results
+./compile.sh test.braille results
 ```
 
 De esta manera se va a obtener el ejecutable:

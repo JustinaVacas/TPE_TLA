@@ -1,6 +1,8 @@
 %{
 	#include <stdio.h>
 	#include <stdlib.h>
+	#include "node_generator.h"
+	#include "y.tab.h" 
 %}
 
 %option noyywrap
@@ -20,6 +22,7 @@ variable  		[a-zA-Z0-9]+
 "dividir_en"			{ return DIVIDE_ASSIGN; }
 "contraer"				{ return CONTRACTION; }
 "si"					{ return IF; }
+"\n"  					{ yylineno++; return NEW_LINE; }
 
 {intnumber}        		{ strcpy(yylval.buffer, yytext); return INT; }
 {variable}    			{ strcpy(yylval.buffer, yytext); return VARIABLE; }

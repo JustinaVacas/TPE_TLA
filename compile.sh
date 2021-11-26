@@ -8,7 +8,7 @@ fi
 
 # check if the source file exists
 FILE_SOURCE="$1"
-if [ ! ${FILE_SOURCE: -4} == ".braille" ]; then
+if [ ! ${FILE_SOURCE: -8} == ".braille" ]; then
     echo "The source file must have .braille extension"
     exit 1
 fi
