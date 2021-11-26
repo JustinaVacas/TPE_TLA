@@ -11,6 +11,19 @@ Autómatas, teoría de lenguajes y compiladores
 
 ## Como compilar y ejecutar
 
+```bash
+chmod +x ./install.sh
+./install.sh
+chmod +x ./compile.sh
+./compile.sh file.braille results
+```
+
+De esta manera se va a obtener el ejecutable:
+
+```bash
+./results
+```
+
 ## Programas de ejemplo
 
 Se encuentran bajo la carpeta [`examples`](./examples)
