@@ -29,41 +29,73 @@ definiciones
 /* En la parte de definiciones se define los token, todos los terminales
 con start marcamos el distinguido */ 
 
-%token ASSIGN
-%token TRANSLATE
-%token PRINT
-%token PRINT_B
-%token DIVIDE_ASSIGN
-%token CONTRACTION
-%token CREATE_VARIABLE_BRAILLE
-%token CREATE_VARIABLE_TEXT
-%token IF
-%token NEW_LINE
-
-%token INNER_BLOCK_START
-%token INNER_BLOCK_END
-
+/* data type */
 %token VARIABLE
 %token INT_BRAILLE
 %token INT_TEXT
 %token STRING_BRAILLE
 %token STRING_TEXT
+%token CREATE_VARIABLE_BRAILLE
+%token CREATE_VARIABLE_TEXT
 
-%type <node> assign_operation
-%type <node> expression
-%type <node> normal_expression
-%type <node> constant_expression
-%type <node> variable_expression
-%type <node> right_expression
+/* Functions */
+%token TRANSLATE
+%token PRINT
+%token PRINT_B
+%token CONTRACTION
+
+/* Blocks*/
+%token ASSIGN
+%token DIVIDE_ASSIGN
+
+/* Conditional*/
+%token IF 
+%token ELSE
+%token THEN  
+
+/*Relational operators*/
+%token '-' 
+%token '+' 
+%token '*' 
+%token '/' 
+%token '<' 
+%token '>'
+%token '('
+%token ')' 
+%token EQ 
+%token LE 
+%token GE 
+%token NEQ
+
+/*Logical operators*/
+%token AND 
+%token OR 
+
+%token NEW_LINE
+
+%token INNER_BLOCK_START
+%token INNER_BLOCK_END
+
+%type <node> program
+%type <node> blocks
 %type <node> block
-%type <node> print_block
+%type <node> expression_int
+%type <node> expression_string
+%type <node> relationals_int
+%type <node> relationals_string
+%type <node> variable
+%type <node> string
+%type <node> num
+%type <node> assign_int
+%type <node> assign_string
 
 %type <buffer> VARIABLE
-%type <buffer> STRING
-%type <buffer> INT
+%type <buffer> STRING_BRAILLE STRING_TEXT
+%type <buffer> INT_BRAILLE INT_TEXT
 
-%type <lista> inner_block
-%type <lista> instructions_list
+%type <token> CREATE_VARIABLE_BRAILLE
+%type <token> CREATE_VARIABLE_TEXT
+
 
 %parse-param {node_list ** program}
 
@@ -74,13 +106,13 @@ con start marcamos el distinguido */
 program --> blocks --> blocks block --> blocks block block
 */
 program: 
-	blocks {$$ = $1}
+	blocks {$$ = $1;}
 	;
 
 blocks:
 	block {}
 	| blocks block {
-		create_node()
+		// create_node();
 	}
 	;
 
@@ -89,6 +121,8 @@ block:
 	| expression_string {}
 	| assign_int {}
 	| assign_string {}
+	| if_int {}
+	| if_string {}
 	;
 	
 expression_int:
@@ -98,36 +132,36 @@ expression_int:
 	| expression_int '/' expression_int {}
 	| expression_int '%' expression_int {}
 	| '(' expression_int ')' {}
-	| variable {$$ = $1}
-	| num {$$ = $1}
+	| variable {$$ = $1;}
+	| num {$$ = $1;}
 	; 
 
 relationals_int:
 	expression_int '>' expression_int {}
 	| expression_int '<' expression_int {}
-	| expression_int 'GE' expression_int {}
-	| expression_int 'NEQ' expression_int {}
-	| expression_int 'LE' expression_int {}
-	| expression_int 'OR' expression_int {}
-	| expression_int 'AND' expression_int {}
-	| expression_int 'EQ' expression_int {}
+	| expression_int GE expression_int {}
+	| expression_int NEQ expression_int {}
+	| expression_int LE expression_int {}
+	| expression_int OR expression_int {}
+	| expression_int AND expression_int {}
+	| expression_int EQ expression_int {}
 	;
 
 expression_string:
 	expression_string '+' expression_string {}
-	| variable {$$ = $1}
-	| string {$$ = $1}
+	| variable {$$ = $1;}
+	| string {$$ = $1;}
 	; 
 
 relationals_string:
 	expression_string '>' expression_string {}
 	| expression_string '<' expression_string {}
-	| expression_string 'GE' expression_string {}
-	| expression_string 'NEQ' expression_string {}
-	| expression_string 'LE' expression_string {}
-	| expression_string 'OR' expression_string {}
-	| expression_string 'AND' expression_string {}
-	| expression_string 'EQ' expression_string {}
+	| expression_string GE expression_string {}
+	| expression_string NEQ expression_string {}
+	| expression_string LE expression_string {}
+	| expression_string OR expression_string {}
+	| expression_string AND expression_string {}
+	| expression_string EQ expression_string {}
 	;
 
 variable:
@@ -135,13 +169,25 @@ variable:
 	;
 
 num:
-	INT_TEXT { $$ = create_int_text_node($1) }
+	INT_TEXT 
+	// { $$ = create_int_text_node($1); }
 	| INT_BRAILLE {}
 	;
 
 string:
-	STRING_TEXT { $$ = create_string_text_node($1) }
+	STRING_TEXT 
+	// { $$ = create_string_text_node($1); }
 	| STRING_BRAILLE {}
+	;
+
+if_int:
+	IF relationals_int THEN block {}
+	| IF relationals_int THEN block ELSE block {}
+	;
+
+if_string:
+	IF relationals_string THEN block {}
+	| IF relationals_string THEN block ELSE block {}
 	;
 
 assign_int:
@@ -154,9 +200,7 @@ assign_string:
 	| CREATE_VARIABLE_TEXT variable ASSIGN STRING_TEXT {}
 	;
 
-if_exp:
-	IF relationals_int 
-
+ 
 
 /* 
 

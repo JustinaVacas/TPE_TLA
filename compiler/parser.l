@@ -24,9 +24,9 @@ variable  		[a-zA-Z0-9]+
 "si"					{ return IF; }
 "\n"  					{ yylineno++; return NEW_LINE; }
 
-{intnumber}        		{ strcpy(yylval.buffer, yytext); return INT; }
+{intnumber}        		{ strcpy(yylval.buffer, yytext); return INT_TEXT; }
 {variable}    			{ strcpy(yylval.buffer, yytext); return VARIABLE; }
-{string}				{ strcpy(yylval.buffer, yytext); return STRING; }
+{string}				{ strcpy(yylval.buffer, yytext); return STRING_TEXT; }
 .
 
 %%
