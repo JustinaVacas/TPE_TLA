@@ -1,5 +1,5 @@
-#include "node.h"
 #include <stdio.h>
+#include "node.h"
 
 node_t* execute_node(node_t* node){
     if(node==NULL){
@@ -9,11 +9,11 @@ node_t* execute_node(node_t* node){
     return node->process(node);
 }
 
-void execute(node_t* ast) {
-    execute_node(ast);
+void execute_n(node_t* node) {
+    execute_node(node);
 }
 
-void free_ast(node_t* node) {
+void free_n(node_t* node) {
     free_node(node);
 }
 

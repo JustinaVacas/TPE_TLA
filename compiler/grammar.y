@@ -12,10 +12,10 @@ definiciones
 
 %{
 	#include <stdio.h>
-	#include "./node_generator.h"
+	#include "./node.h"
 	#include "./generator.h"
 	extern int yylineno;
-	void yyerror(node_list **, char *);
+	void yyerror(node_t* , char *);
 	void smerror(char * msg);
 	static int hasReturn = 0;
 %}
@@ -23,7 +23,7 @@ definiciones
 %union {
  	char buffer[1000];
  	node_t * node;
-	node_list * lista;
+	char * variable
 }
 
 /* En la parte de definiciones se define los token, todos los terminales
@@ -115,7 +115,7 @@ con start marcamos el distinguido */
 %right '('
 
 
-%parse-param {node_list ** program}
+%parse-param {node_t * code}
 
 %start program
 
@@ -131,14 +131,14 @@ int aux3 = 4
 aux3 = aux1 + aux2 
 */
 program: 
-	blocks { $$ = $1; }
+	blocks { code = $1; }
 	;
 
 blocks:
-	blocks block {
-		// $$ = create_block_node($1,$2,yylineno);
+	blocks block { $$ = create_blocks_node($1,$2,yylineno);}
+	| {
+		$$ = NULL;
 	}
-	| {}
 	;
 
 block:
@@ -212,13 +212,13 @@ string:
 	;
 
 if_int:
-	IF relationals_int THEN block {}
-	| IF relationals_int THEN block ELSE block {}
+	IF relationals_int THEN blocks {}
+	| IF relationals_int THEN blocks ELSE blocks {}
 	;
 
 if_string:
-	IF relationals_string THEN block {}
-	| IF relationals_string THEN block ELSE block {}
+	IF relationals_string THEN blocks {}
+	| IF relationals_string THEN blocks ELSE blocks {}
 	;
 
 assign:
@@ -255,9 +255,8 @@ do_while:
 	;
 	
 declaration:
-	CREATE_VARIABLE_INT variable_int 
-	// { $$ = create_declaration_node($2,yylineno); }
-	| CREATE_VARIABLE_STRING variable_string 
+	CREATE_VARIABLE_INT variable_int { $$ = create_declaration_node(0,$2,yylineno); }
+	| CREATE_VARIABLE_STRING variable_string { $$ = create_declaration_node(1,$2,yylineno); }
 	// { $$ = create_declaration_node($2,yylineno); }
 	;
 	
@@ -284,7 +283,7 @@ text aux es "joji"
 
 %%
 
-void yyerror(node_list ** program, char *msg) {
+void yyerror(node_t * code, char *msg) {
 	fprintf(stderr, "%s at line number %d\n\n", msg, yylineno);
   	exit(1);
 }
@@ -293,23 +292,16 @@ void smerror(char *msg) {
   	exit(1);
 }
 int main() {
-	node_list * program;
-  	int ret = yyparse(&program);
+	node_t * code;
+  	int ret = yyparse(&code);
 	if (ret == 1) {
 		fprintf(stderr, "%s", "Error parsing program.\n\n");
 		return 1;
 	} else if (ret == 2) {
 		fprintf(stderr, "%s", "Error run out of memory.\n\n");
 	}
-	
-	printf("#include <stdio.h>\n");
-	printf("#include <stdlib.h>\n\n");
-	printf("int main(int argc, char const *argv[])\n{\n");
-	printf("%s\n", generate_code(program));
-	if(!hasReturn){
-		printf("\nreturn 0;\n");
-	}
-	printf("}");
+
+	generate_code(code);
 
 	return 0;
 }

@@ -11,7 +11,7 @@ OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
 HEADERS = $(wildcard *.h)
 
 %.o: %.c $(HEADERS)
-		$(CC) $(CFLAGS) -c $< -o $@
+		$(CC) $(CFLAGS) -I ./hash_maps ./error_handler -c $< -o $@
 
 $(TARGET): $(OBJECTS)
 		$(CC) $(OBJECTS) -w -o $@

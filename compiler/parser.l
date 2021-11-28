@@ -1,7 +1,7 @@
 %{
 	#include <stdio.h>
 	#include <stdlib.h>
-	#include "node_generator.h"
+	#include "node.h"
 	#include "y.tab.h" 
 %}
 
