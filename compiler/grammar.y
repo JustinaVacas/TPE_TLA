@@ -44,12 +44,14 @@ con start marcamos el distinguido */
 %token INNER_BLOCK_END
 
 %token VARIABLE
-%token INT
-%token STRING
+%token INT_BRAILLE
+%token INT_TEXT
+%token STRING_BRAILLE
+%token STRING_TEXT
 
 %type <node> assign_operation
 %type <node> expression
-%type <node> primary_expression
+%type <node> normal_expression
 %type <node> constant_expression
 %type <node> variable_expression
 %type <node> right_expression
@@ -65,58 +67,112 @@ con start marcamos el distinguido */
 
 %parse-param {node_list ** program}
 
-%start instructions_list
+%start program
 
 %%
-
-primary_expression:
-	constant_expression { $$ = $1; }
-    | STRING { $$ = string_node_generator($1); }
+/* braille aux
+program --> blocks --> blocks block --> blocks block block
+*/
+program: 
+	blocks {$$ = $1}
 	;
 
-constant_expression:
-	INT { $$ = constant_node_generator($1, INT_CONSTANT); }
-	;
-
-variable_expression:
-	VARIABLE { $$ = variable_node_generator($1); }
-	;
-
-right_expression:
-	primary_expression { $$ = $1; }
-	| variable_expression { $$ = $1; }
-	;
-
-assign_operation:
-	right_expression { $$ = $1; }
-	| CREATE_VARIABLE_TEXT variable_expression ASSIGN assign_operation { $$ = operation_node_generator($2, $4, "="); }
-    ;
-
-expression:
-	assign_operation { $$ = $1; }
+blocks:
+	block {}
+	| blocks block {
+		create_node()
+	}
 	;
 
 block:
-	inner_block { $$ = block_node_generator($1); }
-	| print_block { $$ = $1; }
-	| expression  { $$ = instruction_node_generator($1); }
-	| NEW_LINE { $$ = empty_node_generator(); }
+	expression_int {}
+	| expression_string {}
+	| assign_int {}
+	| assign_string {}
+	;
+	
+expression_int:
+	expression_int '+' expression_int {}
+	| expression_int '-' expression_int {}
+	| expression_int '*' expression_int {}
+	| expression_int '/' expression_int {}
+	| expression_int '%' expression_int {}
+	| '(' expression_int ')' {}
+	| variable {$$ = $1}
+	| num {$$ = $1}
+	; 
+
+relationals_int:
+	expression_int '>' expression_int {}
+	| expression_int '<' expression_int {}
+	| expression_int 'GE' expression_int {}
+	| expression_int 'NEQ' expression_int {}
+	| expression_int 'LE' expression_int {}
+	| expression_int 'OR' expression_int {}
+	| expression_int 'AND' expression_int {}
+	| expression_int 'EQ' expression_int {}
 	;
 
-inner_block:
-	INNER_BLOCK_START INNER_BLOCK_END { $$ = instruction_list_generator(NULL); }
-	| INNER_BLOCK_START instructions_list INNER_BLOCK_END { $$ = $2; }
-	| INNER_BLOCK_START instructions_list INNER_BLOCK_END NEW_LINE{ $$ = $2; }
+expression_string:
+	expression_string '+' expression_string {}
+	| variable {$$ = $1}
+	| string {$$ = $1}
+	; 
+
+relationals_string:
+	expression_string '>' expression_string {}
+	| expression_string '<' expression_string {}
+	| expression_string 'GE' expression_string {}
+	| expression_string 'NEQ' expression_string {}
+	| expression_string 'LE' expression_string {}
+	| expression_string 'OR' expression_string {}
+	| expression_string 'AND' expression_string {}
+	| expression_string 'EQ' expression_string {}
 	;
 
-instructions_list:
-	block { $$ = (*program = instruction_list_generator($1)); }
-	| instructions_list block { $$ = (*program = add_instruction_generator($1, $2)); }
+variable:
+	VARIABLE {}
 	;
 
-print_block:
-	PRINT expression { $$ = print_node_generator($2); }
+num:
+	INT_TEXT { $$ = create_int_text_node($1) }
+	| INT_BRAILLE {}
 	;
+
+string:
+	STRING_TEXT { $$ = create_string_text_node($1) }
+	| STRING_BRAILLE {}
+	;
+
+assign_int:
+	CREATE_VARIABLE_BRAILLE variable ASSIGN INT_BRAILLE {}
+	| CREATE_VARIABLE_TEXT variable ASSIGN INT_TEXT {}
+	;
+	
+assign_string:
+	CREATE_VARIABLE_BRAILLE variable ASSIGN STRING_BRAILLE {}
+	| CREATE_VARIABLE_TEXT variable ASSIGN STRING_TEXT {}
+	;
+
+if_exp:
+	IF relationals_int 
+
+
+/* 
+
+text aux es "joji"
+	aux = joji
+                                     --> distinguirlos
+	braille aux2 es 245.34.245.10
+	aux = 245.34.245.10
+	text hola es "justi" 
+
+
+	text aux es 1
+
+	braille aux es 1000000
+*/
+
 %%
 
 void yyerror(node_list ** program, char *msg) {
