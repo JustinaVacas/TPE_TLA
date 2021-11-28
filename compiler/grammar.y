@@ -136,7 +136,7 @@ program:
 
 blocks:
 	blocks block {
-		$$ = create_block_node($1,$2,yylineno);
+		// $$ = create_block_node($1,$2,yylineno);
 	}
 	| {}
 	;
@@ -222,8 +222,10 @@ if_string:
 	;
 
 assign:
-	variable_int ASSIGN expression_int {  $$ = create_assignation_node($1,$3,yylineno);  }
-	| variable_string ASSIGN expression_string { $$ = create_assignation_node($1,$3,yylineno); }
+	variable_int ASSIGN expression_int 
+	// {  $$ = create_assignation_node($1,$3,yylineno);  }
+	| variable_string ASSIGN expression_string 
+	// { $$ = create_assignation_node($1,$3,yylineno); }
 	;
 
 traducir:
@@ -253,13 +255,17 @@ do_while:
 	;
 	
 declaration:
-	CREATE_VARIABLE_INT variable_int { $$ = create_declaration_node($1,$2,yylineno)}
-	| CREATE_VARIABLE_STRING variable_string { $$ = create_declaration_node($1,$2,yylineno) }
+	CREATE_VARIABLE_INT variable_int 
+	// { $$ = create_declaration_node($2,yylineno); }
+	| CREATE_VARIABLE_STRING variable_string 
+	// { $$ = create_declaration_node($2,yylineno); }
 	;
 	
 definition:
-	CREATE_VARIABLE_INT variable_int ASSIGN expression_int {  $$ = create_definition_node($1,$2,$4,yylineno) }
-	| CREATE_VARIABLE_STRING variable_string ASSIGN expression_string { $$ = create_definition_node($1,$2,$4,yylineno) }
+	CREATE_VARIABLE_INT variable_int ASSIGN expression_int 
+	// {  $$ = create_definition_node($2,$4,yylineno); }
+	| CREATE_VARIABLE_STRING variable_string ASSIGN expression_string 
+	// { $$ = create_definition_node($2,$4,yylineno); }
 	;
 	
 /* 
