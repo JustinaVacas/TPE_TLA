@@ -1,7 +1,7 @@
 %{
 	#include <stdio.h>
 	#include <stdlib.h>
-	#include "node.h"
+	#include "generator.h"
 	#include "y.tab.h" 
 %}
 
@@ -22,8 +22,6 @@ variable_string		[a-zA-Z0-9]+
 "print_b"				{ return PRINT_B; }
 "dividir_en"			{ return DIVIDE_ASSIGN; }
 "contraer"				{ return CONTRACTION; }
-"si"					{ return IF; }
-"entonces"				{ return ELSE; }
 "\n"  					{ yylineno++; return NEW_LINE; }
 
 {intnumber}        		{ strcpy(yylval.buffer, yytext); return INT; }
@@ -33,6 +31,9 @@ variable_string		[a-zA-Z0-9]+
 .
 
 %%
+
+// "si"					{ return IF; }
+// "entonces"				{ return ELSE; }
 
 // 2 tipos de input que se indican con las palabras "braille" y "texto"
 

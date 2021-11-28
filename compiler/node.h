@@ -37,9 +37,9 @@ typedef enum{
   STRING_TYPE,
 } value_type;
 
+// NODE
 void execute_n(node_t* node);
 node_t * execute_node(node_t* node);
 void free_n(node_t* node);
 void free_node(node_t* node);
-
 #endif

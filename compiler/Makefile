@@ -1,3 +1,4 @@
+
 TARGET = compiler
 CC = gcc
 CFLAGS = -w

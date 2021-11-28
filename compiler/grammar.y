@@ -12,26 +12,26 @@ definiciones
 
 %{
 	#include <stdio.h>
-	#include "./node.h"
-	#include "./generator.h"
+	#include <stdlib.h>
+	#include "generator.h"
 	extern int yylineno;
+	int yylex();
 	void yyerror(node_t* , char *);
 	void smerror(char * msg);
-	static int hasReturn = 0;
 %}
 
 %union {
  	char buffer[1000];
  	node_t * node;
-	char * variable
+	char * variable;
 }
 
 /* En la parte de definiciones se define los token, todos los terminales
 con start marcamos el distinguido */ 
 
 /* Bata Type */
-%token VARIABLE_STRING
-%token VARIABLE_INT
+%token <variable> VARIABLE_STRING
+%token <variable> VARIABLE_INT
 %token INT
 %token STRING
 %token CREATE_VARIABLE_STRING
@@ -48,12 +48,10 @@ con start marcamos el distinguido */
 %token DIVIDE_ASSIGN
 
 /* Conditional */
-%token IF 
-%token ELSE
-%token THEN  
+// %token IF 
+// %token THEN  
 %token DO 
 %token WHILE
-%nonassoc IF ELSE
 
 /* Relational operators */
 %token '-' 
@@ -89,22 +87,12 @@ con start marcamos el distinguido */
 %type <node> printb
 %type <node> traducir
 %type <node> contraer
-%type <node> variable_int
-%type <node> variable_string
 %type <node> string
 %type <node> do_while
 %type <node> num
 %type <node> assign
 %type <node> declaration
 %type <node> definition
-
-%type <buffer> VARIABLE_STRING
-%type <buffer> VARIABLE_INT
-%type <buffer> STRING
-%type <buffer> INT
-
-%type <token> CREATE_VARIABLE_STRING
-%type <token> CREATE_VARIABLE_INT
 
 %right '='
 %left OR AND
@@ -115,7 +103,7 @@ con start marcamos el distinguido */
 %right '('
 
 
-%parse-param {node_t * code}
+%parse-param {node_t* code}
 
 %start program
 
@@ -149,8 +137,8 @@ block:
 	| print {}
 	| printb {}
 	| contraer {} 
-	| if_int {}
-	| if_string {}
+	// | if_int {}
+	// | if_string {}
 	| do_while {}
 	;
 	
@@ -161,7 +149,7 @@ expression_int:
 	| expression_int '/' expression_int {}
 	| expression_int '%' expression_int {}
 	| '(' expression_int ')' {}
-	| variable_int {$$ = $1;}
+	| VARIABLE_INT {}
 	| num {$$ = $1;}
 	; 
 
@@ -178,7 +166,7 @@ relationals_int:
 
 expression_string:
 	expression_string '+' expression_string {}
-	| variable_string {$$ = $1;}
+	| VARIABLE_STRING {}
 	| string {$$ = $1;}
 	; 
 
@@ -193,13 +181,6 @@ relationals_string:
 	| expression_string EQ expression_string {}
 	;
 
-variable_int:
-	VARIABLE_INT {}
-	;
-
-variable_string:
-	VARIABLE_STRING {}
-	;
 
 num:
 	INT {} 
@@ -211,43 +192,41 @@ string:
 	// { $$ = create_string_text_node($1); }
 	;
 
-if_int:
-	IF relationals_int THEN blocks {}
-	| IF relationals_int THEN blocks ELSE blocks {}
-	;
+// if_int:
+// 	IF relationals_int THEN blocks {}
+// 	;
 
-if_string:
-	IF relationals_string THEN blocks {}
-	| IF relationals_string THEN blocks ELSE blocks {}
-	;
+// if_string:
+// 	IF relationals_string THEN blocks {}
+// 	;
 
 assign:
-	variable_int ASSIGN expression_int 
+	VARIABLE_INT ASSIGN expression_int 
 	// {  $$ = create_assignation_node($1,$3,yylineno);  }
-	| variable_string ASSIGN expression_string 
+	| VARIABLE_STRING ASSIGN expression_string 
 	// { $$ = create_assignation_node($1,$3,yylineno); }
 	;
 
 traducir:
-	TRANSLATE variable_string {}
+	TRANSLATE VARIABLE_STRING {}
 	;
 	
 print:
-	PRINT variable_int {}
-	| PRINT variable_string {}
+	PRINT VARIABLE_INT {}
+	| PRINT VARIABLE_STRING {}
 	| PRINT num {}
 	| PRINT string {}
 	;
 
 printb:
-	PRINT_B variable_int {}
-	| PRINT_B variable_string {}
+	PRINT_B VARIABLE_INT {}
+	| PRINT_B VARIABLE_STRING {}
 	| PRINT_B num {}
 	| PRINT_B string {}
 	;
 
 contraer:
-	CONTRACTION variable_string {}
+	CONTRACTION VARIABLE_STRING {}
 	;
 
 do_while:
@@ -255,15 +234,15 @@ do_while:
 	;
 	
 declaration:
-	CREATE_VARIABLE_INT variable_int { $$ = create_declaration_node(0,$2,yylineno); }
-	| CREATE_VARIABLE_STRING variable_string { $$ = create_declaration_node(1,$2,yylineno); }
+	CREATE_VARIABLE_INT VARIABLE_INT { $$ = create_declaration_node(0,$2,yylineno); }
+	| CREATE_VARIABLE_STRING VARIABLE_STRING { $$ = create_declaration_node(1,$2,yylineno); }
 	// { $$ = create_declaration_node($2,yylineno); }
 	;
 	
 definition:
-	CREATE_VARIABLE_INT variable_int ASSIGN expression_int 
+	CREATE_VARIABLE_INT VARIABLE_INT ASSIGN expression_int 
 	// {  $$ = create_definition_node($2,$4,yylineno); }
-	| CREATE_VARIABLE_STRING variable_string ASSIGN expression_string 
+	| CREATE_VARIABLE_STRING VARIABLE_STRING ASSIGN expression_string 
 	// { $$ = create_definition_node($2,$4,yylineno); }
 	;
 	
@@ -292,8 +271,8 @@ void smerror(char *msg) {
   	exit(1);
 }
 int main() {
-	node_t * code;
-  	int ret = yyparse(&code);
+	node_t *code;
+  	int ret = yyparse(code);
 	if (ret == 1) {
 		fprintf(stderr, "%s", "Error parsing program.\n\n");
 		return 1;

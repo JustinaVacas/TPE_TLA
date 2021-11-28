@@ -1,7 +1,6 @@
-CFLAGS = -I$(CURDIR) std=c99 -D_POSIX_C_SOURCE -Wall -g -pedantic -pedantic-errors -Wextra -fsanitize=address -O3 -Wno-unused-parameter -Wno-implicit-fallthrough -lfl
+CFLAGS = -std=c99 -D_POSIX_C_SOURCE -Wall -g -pedantic -pedantic-errors -Wextra -fsanitize=address -O3 -Wno-unused-parameter -Wno-implicit-fallthrough -lfl
 
-YACCFLAGS =-d -v -t 
-
+YACCFLAGS =-d -v -t
 SOURCES_C_LEX=lex.yy.c
 SOURCES_C_YACC=y.tab.c
 HEADER_C_YACC=y.tab.h
@@ -18,13 +17,13 @@ COMPILER=compiler/*
 HASH_MAPS=compiler/hash_maps/*
 ERROR_HANLDER=compiler/error_handler/*
 
-SOURCE_DIRS=$(COMPILER_UTILS) $(HASH_MAPS) $(ERROR_HANLDER)
+SOURCE_DIRS=$(COMPILER) $(HASH_MAPS) $(ERROR_HANLDER)
 
 #MAIN DIRECTIVES
 all: $(EXECUTABLE_COMPILER) 
 
 $(EXECUTABLE_COMPILER): $(SOURCES_C_LEX) $(SOURCES_C_YACC) $(OBJECTS_FILES)
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) -I ./compiler $^ -o $@
 
 $(SOURCES_C_LEX): $(SOURCES_LEX)
 	flex $<

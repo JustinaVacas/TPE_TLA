@@ -1,4 +1,3 @@
-#include "node.h"
 #include "generator.h"
 
 void generate_code(node_t *node){
