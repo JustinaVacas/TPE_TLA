@@ -9,12 +9,13 @@
 
 string			\"[^\"]*\"
 intnumber      	-?[0-9]+?
-variable  		[a-zA-Z0-9]+
+variable_int  		[a-zA-Z0-9]+
+variable_string		[a-zA-Z0-9]+
 
 %%
 
-"braille"		        { return CREATE_VARIABLE_BRAILLE; }
-"texto"                 { return CREATE_VARIABLE_TEXT; }
+"texto"			        { return CREATE_VARIABLE_STRING; }
+"num"      	            { return CREATE_VARIABLE_INT; }
 "es"			        { return ASSIGN; }
 "traducir"				{ return TRANSLATE; }
 "print"					{ return PRINT; }
@@ -22,11 +23,13 @@ variable  		[a-zA-Z0-9]+
 "dividir_en"			{ return DIVIDE_ASSIGN; }
 "contraer"				{ return CONTRACTION; }
 "si"					{ return IF; }
+"entonces"				{ return ELSE; }
 "\n"  					{ yylineno++; return NEW_LINE; }
 
-{intnumber}        		{ strcpy(yylval.buffer, yytext); return INT_TEXT; }
-{variable}    			{ strcpy(yylval.buffer, yytext); return VARIABLE; }
-{string}				{ strcpy(yylval.buffer, yytext); return STRING_TEXT; }
+{intnumber}        		{ strcpy(yylval.buffer, yytext); return INT; }
+{variable_int}    		{ strcpy(yylval.buffer, yytext); return VARIABLE_INT; }
+{variable_string}    	{ strcpy(yylval.buffer, yytext); return VARIABLE_STRING; }
+{string}				{ strcpy(yylval.buffer, yytext); return STRING; }
 .
 
 %%

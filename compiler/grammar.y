@@ -29,14 +29,13 @@ definiciones
 /* En la parte de definiciones se define los token, todos los terminales
 con start marcamos el distinguido */ 
 
-/* data type */
-%token VARIABLE
-%token INT_BRAILLE
-%token INT_TEXT
-%token STRING_BRAILLE
-%token STRING_TEXT
-%token CREATE_VARIABLE_BRAILLE
-%token CREATE_VARIABLE_TEXT
+/* Bata Type */
+%token VARIABLE_STRING
+%token VARIABLE_INT
+%token INT
+%token STRING
+%token CREATE_VARIABLE_STRING
+%token CREATE_VARIABLE_INT
 
 /* Functions */
 %token TRANSLATE
@@ -44,16 +43,19 @@ con start marcamos el distinguido */
 %token PRINT_B
 %token CONTRACTION
 
-/* Blocks*/
+/* Blocks */
 %token ASSIGN
 %token DIVIDE_ASSIGN
 
-/* Conditional*/
+/* Conditional */
 %token IF 
 %token ELSE
 %token THEN  
+%token DO 
+%token WHILE
+%nonassoc IF ELSE
 
-/*Relational operators*/
+/* Relational operators */
 %token '-' 
 %token '+' 
 %token '*' 
@@ -67,7 +69,7 @@ con start marcamos el distinguido */
 %token GE 
 %token NEQ
 
-/*Logical operators*/
+/* Logical operators */
 %token AND 
 %token OR 
 
@@ -83,18 +85,34 @@ con start marcamos el distinguido */
 %type <node> expression_string
 %type <node> relationals_int
 %type <node> relationals_string
-%type <node> variable
+%type <node> print
+%type <node> printb
+%type <node> traducir
+%type <node> contraer
+%type <node> variable_int
+%type <node> variable_string
 %type <node> string
+%type <node> do_while
 %type <node> num
-%type <node> assign_int
-%type <node> assign_string
+%type <node> assign
+%type <node> declaration
+%type <node> definition
 
-%type <buffer> VARIABLE
-%type <buffer> STRING_BRAILLE STRING_TEXT
-%type <buffer> INT_BRAILLE INT_TEXT
+%type <buffer> VARIABLE_STRING
+%type <buffer> VARIABLE_INT
+%type <buffer> STRING
+%type <buffer> INT
 
-%type <token> CREATE_VARIABLE_BRAILLE
-%type <token> CREATE_VARIABLE_TEXT
+%type <token> CREATE_VARIABLE_STRING
+%type <token> CREATE_VARIABLE_INT
+
+%right '='
+%left OR AND
+%left '>' '<' LE GE EQ NEQ
+%left '+' '-'
+%left '*' '/' '%'
+%left ')'
+%right '('
 
 
 %parse-param {node_list ** program}
@@ -104,25 +122,36 @@ con start marcamos el distinguido */
 %%
 /* braille aux
 program --> blocks --> blocks block --> blocks block block
+block --> assign --> texto variable es expression_string 
+--> texto aux es string --> texto aux es "hola"
+block --> if_int --> si relationals_int entonces block --> si exp_int EQ expresion_int entonces assign
+int aux1 = 1
+int aux2 = 2
+int aux3 = 4
+aux3 = aux1 + aux2 
 */
 program: 
-	blocks {$$ = $1;}
+	blocks { $$ = $1; }
 	;
 
 blocks:
-	block {}
-	| blocks block {
-		// create_node();
+	blocks block {
+		$$ = create_block_node($1,$2,yylineno);
 	}
+	| {}
 	;
 
 block:
-	expression_int {}
-	| expression_string {}
-	| assign_int {}
-	| assign_string {}
+	definition {}
+	| declaration {}
+	| assign {}
+	| traducir {} 
+	| print {}
+	| printb {}
+	| contraer {} 
 	| if_int {}
 	| if_string {}
+	| do_while {}
 	;
 	
 expression_int:
@@ -132,7 +161,7 @@ expression_int:
 	| expression_int '/' expression_int {}
 	| expression_int '%' expression_int {}
 	| '(' expression_int ')' {}
-	| variable {$$ = $1;}
+	| variable_int {$$ = $1;}
 	| num {$$ = $1;}
 	; 
 
@@ -149,7 +178,7 @@ relationals_int:
 
 expression_string:
 	expression_string '+' expression_string {}
-	| variable {$$ = $1;}
+	| variable_string {$$ = $1;}
 	| string {$$ = $1;}
 	; 
 
@@ -164,20 +193,22 @@ relationals_string:
 	| expression_string EQ expression_string {}
 	;
 
-variable:
-	VARIABLE {}
+variable_int:
+	VARIABLE_INT {}
+	;
+
+variable_string:
+	VARIABLE_STRING {}
 	;
 
 num:
-	INT_TEXT 
+	INT {} 
 	// { $$ = create_int_text_node($1); }
-	| INT_BRAILLE {}
 	;
 
 string:
-	STRING_TEXT 
+	STRING {}
 	// { $$ = create_string_text_node($1); }
-	| STRING_BRAILLE {}
 	;
 
 if_int:
@@ -190,24 +221,52 @@ if_string:
 	| IF relationals_string THEN block ELSE block {}
 	;
 
-assign_int:
-	CREATE_VARIABLE_BRAILLE variable ASSIGN INT_BRAILLE {}
-	| CREATE_VARIABLE_TEXT variable ASSIGN INT_TEXT {}
+assign:
+	variable_int ASSIGN expression_int {  $$ = create_assignation_node($1,$3,yylineno);  }
+	| variable_string ASSIGN expression_string { $$ = create_assignation_node($1,$3,yylineno); }
+	;
+
+traducir:
+	TRANSLATE variable_string {}
 	;
 	
-assign_string:
-	CREATE_VARIABLE_BRAILLE variable ASSIGN STRING_BRAILLE {}
-	| CREATE_VARIABLE_TEXT variable ASSIGN STRING_TEXT {}
+print:
+	PRINT variable_int {}
+	| PRINT variable_string {}
+	| PRINT num {}
+	| PRINT string {}
 	;
 
- 
+printb:
+	PRINT_B variable_int {}
+	| PRINT_B variable_string {}
+	| PRINT_B num {}
+	| PRINT_B string {}
+	;
 
+contraer:
+	CONTRACTION variable_string {}
+	;
+
+do_while:
+	DO block WHILE relationals_int {}
+	;
+	
+declaration:
+	CREATE_VARIABLE_INT variable_int { $$ = create_declaration_node($1,$2,yylineno)}
+	| CREATE_VARIABLE_STRING variable_string { $$ = create_declaration_node($1,$2,yylineno) }
+	;
+	
+definition:
+	CREATE_VARIABLE_INT variable_int ASSIGN expression_int {  $$ = create_definition_node($1,$2,$4,yylineno) }
+	| CREATE_VARIABLE_STRING variable_string ASSIGN expression_string { $$ = create_definition_node($1,$2,$4,yylineno) }
+	;
+	
 /* 
-
 text aux es "joji"
 	aux = joji
                                      --> distinguirlos
-	braille aux2 es 245.34.245.10
+	texto aux2 es "b245.34.245.10"
 	aux = 245.34.245.10
 	text hola es "justi" 
 
