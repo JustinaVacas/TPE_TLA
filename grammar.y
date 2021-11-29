@@ -151,11 +151,12 @@ end:
 
 program: 
 	blocks
+	| 
 	;
 
 blocks:
-	blocks block 
-	| { printf(";\n");}
+	block blocks
+	| block
 	;
 
 block:
@@ -169,7 +170,7 @@ block:
 	| if_int {}
 	| if_string {}
 	| if_braille {}
-	| do_while {}
+	| do_while {} 
 	;
 	
 expression_int:
