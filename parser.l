@@ -1,39 +1,47 @@
 %{
 	#include <stdio.h>
 	#include <stdlib.h>
-	#include "generator.h"
 	#include "y.tab.h" 
 %}
 
 %option noyywrap
 
-string			\"[^\"]*\"
-intnumber      	-?[0-9]+?
-variable_int  		[a-zA-Z0-9]+
-variable_string		[a-zA-Z0-9]+
+string			["][^\"]*["]
+numero      	-?[0-9]+?
+variable_int  		num_[a-zA-Z0-9]+
+variable_string		txt_[a-zA-Z0-9]+
+variable_braille	bra_[a-zA-Z0-9]+
+braille			 ["]([0-9]{1,4}[.])*[0-9]{1,4}["]
 
 %%
+"texto "			    return CREATE_VARIABLE_STRING;
+"braille "			    return CREATE_VARIABLE_BRAILLE;
+"num "      	        return CREATE_VARIABLE_INT;
+"es"			        return ASSIGN;
+"traducir"				return TRANSLATE;
+"print"					return PRINT;
+"print_b"				return PRINT_B;
+"contraer"				return CONTRACTION;
+"si"					return IF;
+"entonces"				return THEN;
+"hace"					return DO;
+"mientras"				return WHILE;
+"inicio"				return START;
+"fin"					return END;
 
-"texto"			        { return CREATE_VARIABLE_STRING; }
-"num"      	            { return CREATE_VARIABLE_INT; }
-"es"			        { return ASSIGN; }
-"traducir"				{ return TRANSLATE; }
-"print"					{ return PRINT; }
-"print_b"				{ return PRINT_B; }
-"dividir_en"			{ return DIVIDE_ASSIGN; }
-"contraer"				{ return CONTRACTION; }
-"\n"  					{ yylineno++; return NEW_LINE; }
 
-{intnumber}        		{ strcpy(yylval.buffer, yytext); return INT; }
-{variable_int}    		{ strcpy(yylval.buffer, yytext); return VARIABLE_INT; }
-{variable_string}    	{ strcpy(yylval.buffer, yytext); return VARIABLE_STRING; }
-{string}				{ strcpy(yylval.buffer, yytext); return STRING; }
-.
+{numero}        		{ yylval.integer = atoi(yytext); return INT; }
+{variable_int}    		{ strcpy(yylval.variable, yytext); return VARIABLE_INT; }
+{variable_string}    	{ strcpy(yylval.variable, yytext); return VARIABLE_STRING; }
+{variable_braille}    	{ strcpy(yylval.variable, yytext); return VARIABLE_BRAILLE; }
+{string}				{ strcpy(yylval.string, yytext); return STRING; }
+{braille}				{ strcpy(yylval.braille, yytext); return BRAILLE; }
+
+"\n"  					{ yylineno++; ;}
+[ \t]+                  ;
+.						;
 
 %%
-
-// "si"					{ return IF; }
-// "entonces"				{ return ELSE; }
 
 // 2 tipos de input que se indican con las palabras "braille" y "texto"
 
