@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -fsanitize=address-Wno-unused-parameter -Wno-implicit-fallthrough
+CFLAGS = -Wall -fsanitize=address -Wno-unused-parameter -Wno-implicit-fallthrough
 YACCFLAGS = -d -v
 
 C_FILES= *.c
@@ -11,7 +11,7 @@ SOURCE_DIRS=$(COMPILER) $(HASH_MAPS) $(ERROR_HANLDER)
 all: yaccing lexing compile
 
 compile:
-	$(CC) $(CFLAGS) $(C_FILES) -o main
+	$(CC) $(CFLAGS) $(C_FILES) -o braille
 	@echo "Project compiled."
 
 lexing:
@@ -22,6 +22,6 @@ yaccing:
 
 #CLEAN DIRECTIVES
 clean:
-	rm -rf lex.yy.c y.tab.c y.tab.h $(OBJECT_FILES) braille y.output
+	rm -rf lex.yy.c y.tab.c y.tab.h $(OBJECT_FILES) braille y.output intermedio.c test.c
 
 .PHONY: all clean
