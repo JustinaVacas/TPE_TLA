@@ -2,6 +2,11 @@
 
 ./braille < $1 > my_program.c 
 
-gcc -w my_program.c list.c braille.c -o $2
+if [[ $? == 0 ]]; 
+    then
 
-echo "Programa compilado."
+        gcc -w my_program.c list.c braille.c -o $2
+        echo "Programa compilado."
+
+fi
+

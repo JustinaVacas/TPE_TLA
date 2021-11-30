@@ -23,8 +23,8 @@ PLUS 		"+"
 MINUS 		"-"
 MULTIPLY 	"*"
 DIVIDE 		"/"
-GREATER 	"<"
-LOWER 		">"
+GREATER 	">"
+LOWER 		"<"
 EQUALS 		"es"
 NOT_EQUALS 	"no es"
 AND 		"y"
@@ -43,6 +43,7 @@ CLOSE		")"
 PRINT		"imprimir"
 NEW_LINE	"linea"
 READ_AND_TRADUCE "leer y traducir"
+BRAILLE_TO_TEXT "braille_a_texto"
 
 %%
 
@@ -50,6 +51,7 @@ READ_AND_TRADUCE "leer y traducir"
 {END} 					return END;
 {DELIMITER} 			return DELIMITER;
 {READ_AND_TRADUCE}		return READ_AND_TRADUCE;
+{BRAILLE_TO_TEXT}		return BRAILLE_TO_TEXT;
 {INTEGER} 				{yylval.number=atoi(yytext); return INTEGER;}
 {STRING} 				{yylval.string = yytext; return STRING;}
 {TEXT} 					return TEXT;

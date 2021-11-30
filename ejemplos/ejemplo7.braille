@@ -9,10 +9,7 @@ hacer:
     aux = aux - 1,
     imprimir aux,
     imprimir linea,
-    leer y traducir,
+    braille_a_texto,
 mientras(aux>0),
-
-imprimir "Fin",
-imprimir linea,
 
 fin

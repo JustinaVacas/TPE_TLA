@@ -16,6 +16,7 @@
 %token END
 %token DELIMITER
 %token READ_AND_TRADUCE
+%token BRAILLE_TO_TEXT
 
 %token TEXT
 %token NUMBER
@@ -92,6 +93,7 @@ instruction:
 	| assignment delimiter_end
 	| printing delimiter_end
 	| traducing delimiter_end
+	| braille_to_text delimiter_end
 	;
 
 conditional:
@@ -105,6 +107,7 @@ boolean_exp:
 	| boolean_exp and_op boolean_exp
 	| boolean_exp or_op boolean_exp
 	| not_op open_op boolean_exp close_op
+	| open_op boolean_exp close_op
 	;
 
 operator:
@@ -161,11 +164,16 @@ printing:
 traducing:
 	READ_AND_TRADUCE {printf("read_and_traduce()");}
 
+braille_to_text:
+	BRAILLE_TO_TEXT {printf("braille_to_text()");}
+
 expr:
 	var op_sign expr
 	| var
 	| int op_sign expr
 	| int
+	| open_op expr close_op op_sign expr
+	| open_op expr close_op
 	;
 
 op_sign:

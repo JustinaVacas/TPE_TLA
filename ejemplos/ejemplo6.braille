@@ -1,0 +1,28 @@
+inicio
+
+num aux = 1,
+num aux2 = 0,
+
+si ((aux2 es 0 y aux es 2) o aux es 9) entonces 
+    imprimir braille "if 1", 
+    imprimir linea,
+terminado
+si (aux2 es 3 o aux es 1) entonces
+    imprimir braille "if 2", 
+    imprimir linea, 
+terminado
+si (aux2 es 3 o aux es 4) entonces 
+    imprimir braille "if 3", 
+    imprimir linea, 
+terminado
+si (aux2 es 0 y aux es 1) entonces
+    imprimir braille "if 4", 
+    imprimir linea, 
+terminado
+si (aux2 es 0 + aux) entonces
+    imprimir "if 5",
+    imprimir linea, 
+terminado
+
+
+fin
