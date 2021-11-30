@@ -3,15 +3,15 @@
 
 #include <stdbool.h>
 
+/* type: 0 es int, 1 es string, 2 es braille */
 struct node{
     char * variable_name;
-    bool is_braille;
-    bool is_string;
-    bool is_int;
+    int type;
+    bool is_assigned;
     struct node *next;
 };
 
-void add(char *key, bool is_int, bool is_braille);
+void add(char *key, int type);
 struct node * find(char *variable_name);
 
 #endif

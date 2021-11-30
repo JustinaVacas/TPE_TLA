@@ -1,15 +1,3 @@
-/* ESTRUCTURA
-
-%{
-    DECLARACIONES
-%}
-definiciones
-%%{
-    PRODUCCIONES Y REGLAS DE TRADUCCION (y las acciones semanticas asociadas a las prod)
-%}
-{ RUTINAS DE C}
-*/
-
 %{
 	#include <stdio.h>
 	#include <stdlib.h>
@@ -20,317 +8,230 @@ definiciones
 %}
 
 %union {
- 	int integer;
-	char * node;
+ 	int number;
 	char * string;
-	char * braille;
-	char * variable;
 }
 
-/* En la parte de definiciones se define los token, todos los terminales
-con start marcamos el distinguido */ 
-
-/* Bata Type */
-%token <variable> VARIABLE_STRING 
-%token <variable> VARIABLE_INT
-%token <variable> VARIABLE_BRAILLE
-%token <integer> INT
-%token <string> STRING
-%token <braille> BRAILLE
-%token CREATE_VARIABLE_STRING
-%token CREATE_VARIABLE_BRAILLE
-%token CREATE_VARIABLE_INT
 %token START
 %token END
+%token DELIMITER
 
-/* Functions */
-%token TRANSLATE
-%token PRINT
-%token PRINT_B
-%token CONTRACTION
+%token TEXT
+%token NUMBER
 
-/* Blocks */
+%token <string> STRING
+%token <number> INTEGER
+%token <string> VARIABLE
+
+%token MINUS
+%token PLUS
+%token MULTIPLY
+%token DIVIDE
+
+%token LOWER
+%token GREATER
+%token EQUALS
+%token NOT_EQUALS
+%token TRUE
+%token FALSE
+
+%token AND
+%token OR
+%token NOT
+
+%token OPEN
+%token CLOSE
+
 %token ASSIGN
 
-/* Conditional */
-%token IF 
-%token THEN  
-%token DO 
+%token IF
+%token ELSE
 %token WHILE
+%token DO
+%token END_IF
+%token THEN
 
-/* Relational operators */
-%token '-' 
-%token '+' 
-%token '*' 
-%token '/' 
-%token '<' 
-%token '>'
-%token '('
-%token ')' 
-%token '{'
-%token '}' 
-%token EQ 
-%token LE 
-%token GE 
-%token NEQ
-
-/* Logical operators */
-%token AND 
-%token OR 
-
-%type <node> program
-%type <node> blocks
-%type <node> block
-
-%type <node> assign_tk
-
-%type <node> expression_int
-%type <node> expression_string
-%type <node> expression_braille
-
-%type <node> relationals_int
-%type <node> relationals_string
-%type <node> relationals_braille
-
-%type <node> variable_string
-%type <node> variable_int
-%type <node> variable_braille
-
-%type <node> if_int
-%type <node> if_string
-%type <node> if_braille
-
-%type <node> print
-%type <node> printb
-%type <node> traducir
-%type <node> contraer
-%type <node> string
-%type <node> do_while
-%type <node> num
-%type <node> assign
-%type <node> declaration
-%type <node> definition
-%type <node> start
-%type <node> end
+%token PRINT
 
 %right ASSIGN
-%left OR AND
-%left '>' '<' LE GE EQ NEQ
-%left '+' '-'
-%left '*' '/' '%'
-%left ')'
-%right '('
+%left PLUS MINUS
+%left MULTIPLY DIVIDE
+
+%type<string> definition
+%type<number> type
+%type<string> var
+%type<string> expr
 
 %start init
 
+/* type: 0 es int, 1 es string, 2 es braille */
 %%
-
-/* braille aux
-program --> blocks --> blocks block --> blocks block block
-block --> assign --> texto variable es expression_string 
---> texto aux es string --> texto aux es "hola"
-block --> if_int --> si relationals_int entonces block --> si exp_int EQ expresion_int entonces assign
-int aux1 = 1
-int aux2 = 2
-int aux3 = 4
-aux3 = aux1 + aux2 
-*/
 
 init: 
 	start program end
 	;
 
 start:
-	START {printf("#include <stdio.h> \n#include <stdlib.h> \n#include \"list.h\" \n#include \"stdio.h\" \n#include \"string.h\" \n\n"); 
-		printf("int main(){ \n");}
+	START {printf("#include <stdio.h> \n#include <stdlib.h> \n#include \"list.h\" \n#include \"stdio.h\" \n#include \"string.h\" \n\n");printf("int main(){ \n");}
+	;
+
+program:
+	conditional program
+	| instruction program
+	| {}
 	;
 
 end:
 	END {printf("return 0;}");}
 	;
 
-program: 
-	blocks
+instruction:
+	definition delimiter_end
+	| assignment delimiter_end
+	| printing delimiter_end
 	;
 
-blocks:
-	blocks block 
-	| { printf(";\n");}
+conditional:
+	if_def open_op boolean_exp close_op then_def program END_IF {printf("}\n");}
+	| if_def open_op boolean_exp close_op then_def program else_def program END_IF {printf("}\n");}
+	| do_def program while_def open_op boolean_exp close_op delimiter_end {printf("\n");}
 	;
 
-block:
-	definition {}
-	| declaration {}
-	| assign {}
-	| traducir {}
-	| print {}
-	| printb {}
-	| contraer {}
-	| if_int {}
-	| if_string {}
-	| if_braille {}
-	| do_while {}
-	;
-	
-expression_int:
-	expression_int '+' expression_int {}
-	| expression_int '-' expression_int {}
-	| expression_int '*' expression_int {}
-	| expression_int '/' expression_int {}
-	| expression_int '%' expression_int {}
-	| '(' expression_int ')' {}
-	| variable_int {}
-	| num {$$ = $1;}
-	; 
-
-
-variable_int:
-	VARIABLE_INT { struct node * aux = find($1); if(aux != NULL && aux->is_int){printf("%s", $1);} else{ yyerror("no existe la variable o no es int");}}
-	;
-	
-variable_string:
-	VARIABLE_STRING { struct node * aux = find($1); if(aux != NULL && aux->is_string){printf("%s",$1);} else{ yyerror("no existe la variable o no es string");}}
+boolean_exp:
+	expr operator expr
+	| boolean_exp and_op boolean_exp
+	| boolean_exp or_op boolean_exp
+	| not_op boolean_exp
 	;
 
-variable_braille:
-	VARIABLE_BRAILLE {  struct node * aux = find($1); if(aux != NULL && aux->is_braille){printf("%s",$1);} else{ yyerror("no existe la variable o no es braille");}}
+operator:
+	eq_op | neq_op | lower_op | greater_op ;
+
+definition:
+	type VARIABLE {
+		if(!find($2)){
+			add($2,$1);
+		}else {
+			fprintf(stderr, "Variable '%s' is already defined.\n",$2);
+			yyerror("Variable already taken");
+		} printf("%s", $2);
+		$$ = $2;
+		}
 	;
 
-relationals_int:
-	expression_int '>' expression_int {}
-	| expression_int '<' expression_int {}
-	| expression_int GE expression_int {}
-	| expression_int NEQ expression_int {}
-	| expression_int LE expression_int {}
-	| expression_int OR expression_int {}
-	| expression_int AND expression_int {}
-	| expression_int EQ expression_int {}
+assignment:
+	definition assign_op expr
+	| definition assign_op str
+	| var assign_op expr
+	| var assign_op str
 	;
 
-expression_string:
-	expression_string '+' expression_string {}
-	| variable_string {}
-	| string {}
-	; 
-
-relationals_string:
-	expression_string '>' expression_string {}
-	| expression_string '<' expression_string {}
-	| expression_string GE expression_string {}
-	| expression_string NEQ expression_string {}
-	| expression_string LE expression_string {}
-	| expression_string OR expression_string {}
-	| expression_string AND expression_string {}
-	| expression_string EQ expression_string {}
+printing:
+	PRINT STRING {printf("printf(%s)", $2);}
+	| PRINT VARIABLE {printf("printf(%s)", $2);}
 	;
 
-expression_braille:
-	expression_braille '+' expression_braille {}
-	| variable_braille {}
-	| braille {}
-	; 
-
-relationals_braille:
-	expression_braille '>' expression_braille {}
-	| expression_braille '<' expression_braille {}
-	| expression_braille GE expression_braille {}
-	| expression_braille NEQ expression_braille {}
-	| expression_braille LE expression_braille {}
-	| expression_braille OR expression_braille {}
-	| expression_braille AND expression_braille {}
-	| expression_braille EQ expression_braille {}
+expr:
+	var op_sign expr
+	| var {$$ = $1;}
+	| int op_sign expr {$$ = "$1";}
+	| int {$$ = "$1";}
 	;
 
-num:
-	INT {printf("%d",$1);} 
+op_sign:
+	PLUS {printf(" + ");}
+	| MINUS {printf(" - ");}
+	| MULTIPLY {printf(" * ");}
+	| DIVIDE {printf(" / ");}
 	;
 
-string:
-	STRING {printf("%s",$1);}
-	;
-
-braille:
-	BRAILLE {printf("%s",$1);}
-
-if_int:
-	IF relationals_int THEN '{' blocks '}' {}
-	;
-
-if_string:
-	IF relationals_string THEN '{' blocks '}' {}
-	;
-
-if_braille:
-	IF relationals_braille THEN '{' blocks '}' {}
-	;
-
-traducir:
-	TRANSLATE variable_string {}
-	| TRANSLATE variable_braille {}
-	;
-	
-print:
-	PRINT variable_int {}
-	| PRINT variable_string {}
-	| PRINT variable_braille {}
-	| PRINT num {}
-	| PRINT string {}
-	;
-
-printb:
-	PRINT_B variable_int {}
-	| PRINT_B variable_string {}
-	| PRINT_B variable_braille {}
-	| PRINT_B num {}
-	| PRINT_B string {}
-	;
-
-contraer:
-	CONTRACTION variable_braille {}
-	;
-
-do_while:
-	DO block WHILE relationals_int {}
-	;
-
-// texto aux
-declaration:
-	CREATE_VARIABLE_INT variable_int { printf("int "); if(find($2) == NULL){add($2,true, false);} else{yyerror("ya existe la variable");}}
-	| CREATE_VARIABLE_STRING variable_string { printf("char * "); if(find($2) == NULL){add($2,false, false);} else{yyerror("ya existe la variable");}}
-	| CREATE_VARIABLE_BRAILLE variable_braille { printf("char * "); if(find($2) == NULL){add($2,false, true);} else{yyerror("ya existe la variable");} }
-	;
-
-assign:
-	variable_int assign_tk expression_int {}
-	| variable_string assign_tk expression_string {}
-	| variable_braille assign_tk expression_braille {}
-	;
-
-assign_tk: 
+assign_op:
 	ASSIGN {printf(" = ");}
 	;
 
-// texo aux2 es joji	
-definition:
-	CREATE_VARIABLE_INT variable_int assign_tk expression_int { printf("int "); if(find($2) == NULL){add($2,true, false);} else{yyerror("ya existe la variable");}}
-	| CREATE_VARIABLE_STRING variable_string assign_tk expression_string { printf("char * "); if(find($2) == NULL){add($2,false, false);} else{yyerror("ya existe la variable");}}
-	| CREATE_VARIABLE_BRAILLE variable_braille assign_tk expression_braille {  printf("char * "); if(find($2) == NULL){add($2,false, true);} else{yyerror("ya existe la variable");}} 
+open_op:
+	OPEN {printf("(");}
 	;
-	
-/* 
-text aux es "joji"
-	aux = joji
-                                     --> distinguirlos
-	texto aux2 es "b245.34.245.10"
-	aux = 245.34.245.10
-	text hola es "justi" 
 
+close_op:
+	CLOSE {printf(")");}
+	;
 
-	text aux es 1
+if_def:
+	IF {printf("if ");}
+	;
 
-	braille aux es 1000000
-*/
+then_def:
+	THEN {printf(" {");}
+	;
 
+else_def:
+	ELSE {printf("}\n else {");}
+	;
+
+do_def:
+	DO {printf("do { \n");}
+	;
+
+while_def:
+	WHILE {printf("} while ");}
+	;
+
+delimiter_end:
+    DELIMITER {printf(";\n");}
+	;
+
+or_op:
+	OR {printf(" || ");}
+	;
+
+and_op:
+	AND {printf(" && ");}
+	;
+
+not_op: 
+	NOT {printf("!");}
+	;
+
+lower_op: 
+	LOWER {printf("<");}
+	;
+
+greater_op: 
+	GREATER {printf(">");}
+	;
+
+eq_op: 
+	EQUALS {printf("==");}
+	;
+
+neq_op: 
+	NOT_EQUALS {printf("!=");}
+	;
+
+type: NUMBER {$$ = 0; printf("int ");} 
+	| TEXT {$$ = 1; printf("char *");}
+	/* | BRAILLE {$$ = 2; printf("char *");} */
+	; 
+
+var:
+	VARIABLE {
+		struct node * aux = find($1);
+		if(aux != NULL){
+			printf("%s", $1);
+		} else { 
+			fprintf(stderr, "Variable '%s' doesn't exist.\n", $1);
+			yyerror("Variable not exist"); };
+			$$ = $1;
+		}
+	;
+
+int: 
+	INTEGER {printf("%d", $1);}
+	;
+str: 
+	STRING {printf("%s", $1);}
+	;
 %%
 
 void yyerror(char *msg) {
@@ -342,19 +243,3 @@ int main() {
   	yyparse();
 	return 0;
 }
-
-/* reglas de traduccion
-left_side : right side
-    { syntactic action }
-    | right side 2 { action C-snippt 2}
-    | right side 3 { action C-snippet 3}
-
-EJEMPLO
-expr : termino ‘*’ factor
-     {
-    $$ = $1 * $3;   (el 1 representa el valor asociado que tiene el termino y el 3 asociado a factor)
-    }
-    | factor
-    ;
-
- */

@@ -7,25 +7,16 @@ struct node *first = NULL;
 struct node *current = NULL;
 
 
-void add(char *key, bool is_int, bool is_braille){
+void add(char *key, int type){
     
     struct node *list = (struct node *)malloc(sizeof(struct node));
 
     int len = strlen(key);
     list->variable_name = (char *)malloc(sizeof(char) * len + 1);
     strcpy((char *)list->variable_name, (char *)key);
-
-    list->is_int = is_int;
-    if(is_int){
-        list->is_string = false;
-        list->is_braille = false;
-    }
-    else {
-        list->is_braille = is_braille;
-        list->is_string = !is_braille;
-
-    }
-
+    list->type = type;
+    list->is_assigned = false;
+    
     list->next = first;
 
     first = list;

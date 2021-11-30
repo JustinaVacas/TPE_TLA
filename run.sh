@@ -1,12 +1,7 @@
 #!/bin/bash
 
-./braille < $1 > ejemplo.c 
+./braille < $1 > my_program.c 
 
-if [ $? -ne 255 ] 
-then
+gcc my_program.c -o $2
 
-    gcc ejemplo.c -o $2
-
-else
-    echo "Aviso: falta corregir errores para compilar sin problemas"
-fi
+echo "Programa compilado."
