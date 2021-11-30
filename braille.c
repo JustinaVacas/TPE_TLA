@@ -6,7 +6,32 @@
 char * brailles[ALPH] = {"⠁","⠃","⠉","⠙","⠑","⠋","⠛","⠓","⠊","⠚","⠅","⠇","⠍","⠝","⠕","⠏","⠟","⠗","⠎","⠞","⠥","⠧","⠺","⠭","⠽","⠵"};
 char * brailles_num[NUMS] = {"⠴","⠂","⠆","⠒","⠲","⠢","⠖","⠶","⠦","⠔"};
 
+
+int braille_ABC[ALPH] = { 1, 12, 14, 145, 15, 124, 1245, 125, 24, 245, 13, 123, 134, 1345, 135, 1234, 12345, 1235, 234, 2345, 136, 1236, 246, 1346, 1346, 1356};
+
 int itoa(int val, char* buf);
+
+void print_traduce(char * stdin_braille){
+    
+    printf("Braille: %s\n", stdin_braille);
+    printf("Palabra: ");
+    char* token = strtok(stdin_braille, ".");
+    for (int i = 0; token != NULL; i++) {
+        int j;
+        for(j = 0; j < 26; j++){
+            if(atoi(token) == braille_ABC[j]){
+                printf("%c", j  + 'a');
+                break;
+            } 
+        }
+        if(j == 26){
+            printf("Está mal escrito");
+            return;
+        }
+        token = strtok(0, ".");
+    }
+    printf("\n");
+}
 
 void print_braille(char* text){
     printf("Texto original: %s\n", text);
@@ -33,8 +58,9 @@ void print_braille_num(int numero){
 void read_and_traduce(){
     printf("Ingresa el texto para traducir a braille: ");
     char * str = malloc(50);
-    scanf("%49s", str);
+    scanf(" %49[^\n]", str); 
     print_braille(str);
+    free(str);
 }
 
 //return the length of result string. support only 10 radix for easy use and better performance
@@ -83,3 +109,14 @@ int itoa(int val, char* buf){
 
     return len;
 }
+
+//hola, chau, buen dia,
+
+void braille_to_text(){
+    printf("Ingresa el braille para traducir a texto: "); //123.234.45.1 
+    char * str = malloc(50);
+    scanf(" %49[^\n]", str); 
+    print_traduce(str);
+    free(str);
+}
+
