@@ -1,0 +1,13 @@
+inicio
+
+texto aux = "hola",
+imprimir "Imprimir variable: ",
+imprimir aux,
+imprimir braille aux,
+
+finto aux = "hola",
+imprimir "Imprimir variable: ",
+imprimir aux,
+imprimir braille aux,
+
+fin

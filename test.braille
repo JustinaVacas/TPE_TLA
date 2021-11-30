@@ -1,9 +1,0 @@
-inicio
-num aux = 1,
-num aux2 = 0,
-hacer:
-    aux = aux + 1,
-    aux2 = aux2 +2,
-mientras(aux < 4 o lo contrario a aux2 es 6),
-imprimir aux,
-fin

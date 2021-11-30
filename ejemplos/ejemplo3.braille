@@ -1,0 +1,16 @@
+inicio
+
+num aux = 5,
+
+imprimir "Inicio"
+imprimir linea
+
+hacer: 
+    aux = aux - 1,
+    leer y traducir,
+mientras(aux>0),
+
+imprimir "Fin"
+imprimir linea
+
+fin

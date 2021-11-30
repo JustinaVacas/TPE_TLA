@@ -2,6 +2,6 @@
 
 ./braille < $1 > my_program.c 
 
-gcc my_program.c -o $2
+gcc -w my_program.c list.c braille.c -o $2
 
 echo "Programa compilado."

@@ -15,9 +15,11 @@
 %token START
 %token END
 %token DELIMITER
+%token READ_AND_TRADUCE
 
 %token TEXT
 %token NUMBER
+%token BRAILLE
 
 %token <string> STRING
 %token <number> INTEGER
@@ -52,6 +54,7 @@
 %token THEN
 
 %token PRINT
+%token NEW_LINE
 
 %right ASSIGN
 %left PLUS MINUS
@@ -60,7 +63,6 @@
 %type<string> definition
 %type<number> type
 %type<string> var
-%type<string> expr
 
 %start init
 
@@ -72,7 +74,7 @@ init:
 	;
 
 start:
-	START {printf("#include <stdio.h> \n#include <stdlib.h> \n#include \"list.h\" \n#include \"stdio.h\" \n#include \"string.h\" \n\n");printf("int main(){ \n");}
+	START {printf("#include <stdio.h> \n#include <stdlib.h> \n#include \"list.h\" \n#include \"braille.h\" \n#include <string.h> \n\n");printf("int main(){ \n");}
 	;
 
 program:
@@ -89,11 +91,12 @@ instruction:
 	definition delimiter_end
 	| assignment delimiter_end
 	| printing delimiter_end
+	| traducing delimiter_end
 	;
 
 conditional:
-	if_def open_op boolean_exp close_op then_def program END_IF {printf("}\n");}
-	| if_def open_op boolean_exp close_op then_def program else_def program END_IF {printf("}\n");}
+	if_def open_op boolean_exp close_op then_def program end_if_op
+	| if_def open_op boolean_exp close_op then_def program else_def program end_if_op
 	| do_def program while_def open_op boolean_exp close_op delimiter_end {printf("\n");}
 	;
 
@@ -101,7 +104,7 @@ boolean_exp:
 	expr operator expr
 	| boolean_exp and_op boolean_exp
 	| boolean_exp or_op boolean_exp
-	| not_op boolean_exp
+	| not_op open_op boolean_exp close_op
 	;
 
 operator:
@@ -128,14 +131,41 @@ assignment:
 
 printing:
 	PRINT STRING {printf("printf(%s)", $2);}
-	| PRINT VARIABLE {printf("printf(%s)", $2);}
+	| PRINT INTEGER {printf("printf(\"%%d\", %d)", $2);}
+	| PRINT VARIABLE {
+		struct node * aux = find($2);
+		if(aux == NULL){
+			fprintf(stderr, "Variable '%s' doesn't exist.\n", $2);
+			yyerror("Variable not exist");
+		} else if (aux->type == 0){ 
+			printf("printf(\"%%d\", %s)", $2);
+		} else {
+			printf("printf(%s\n)", $2);};
+	}
+	| PRINT BRAILLE STRING {printf("print_braille(%s)", $3);}
+	| PRINT BRAILLE VARIABLE {
+		struct node * aux = find($3);
+		if(aux == NULL){
+			fprintf(stderr, "Variable '%s' doesn't exist.\n", $3);
+			yyerror("Variable not exist");
+		} else if(aux->type == 1){ 
+			printf("print_braille(%s)", $3);
+		} else{
+			printf("print_braille_num(%s)", $3);
+		};
+	}
+	| PRINT BRAILLE INTEGER {printf("print_braille_num(%d)", $3);}
+	| PRINT NEW_LINE {printf("printf(\"\\n\")");}
 	;
+
+traducing:
+	READ_AND_TRADUCE {printf("read_and_traduce()");}
 
 expr:
 	var op_sign expr
-	| var {$$ = $1;}
-	| int op_sign expr {$$ = "$1";}
-	| int {$$ = "$1";}
+	| var
+	| int op_sign expr
+	| int
 	;
 
 op_sign:
@@ -162,11 +192,15 @@ if_def:
 	;
 
 then_def:
-	THEN {printf(" {");}
+	THEN {printf(" {\n");}
 	;
 
 else_def:
 	ELSE {printf("}\n else {");}
+	;
+
+end_if_op:
+	END_IF {printf("}\n");}
 	;
 
 do_def:
@@ -211,7 +245,6 @@ neq_op:
 
 type: NUMBER {$$ = 0; printf("int ");} 
 	| TEXT {$$ = 1; printf("char *");}
-	/* | BRAILLE {$$ = 2; printf("char *");} */
 	; 
 
 var:

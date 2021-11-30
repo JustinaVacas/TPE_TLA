@@ -1,0 +1,9 @@
+inicio
+
+braille aux = "hola como estas",
+imprimir braille aux,
+
+braille aux2 = "feliz navidad",
+imprimir braille aux2,
+
+fin

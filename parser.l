@@ -11,12 +11,12 @@ END 		"fin"
 
 DELIMITER 	","
 
-TEXT 		"texto "
 INTEGER 	[-]?[0-9]+
 STRING 		["][^\n\r]*["]
 NUMBER 		"num"
+TEXT 		"texto"
 BRAILLE 	"braille"
-VARIABLE 	[a-zA-Z]+[_0-9A-Za-z]+
+VARIABLE 	[a-zA-Z]+[_0-9A-Za-z]*
 
 ASSIGN 		"="
 PLUS 		"+"
@@ -41,16 +41,20 @@ WHILE 		"mientras"
 OPEN		"("
 CLOSE		")"
 PRINT		"imprimir"
+NEW_LINE	"linea"
+READ_AND_TRADUCE "leer y traducir"
 
 %%
 
 {START} 				return START;
 {END} 					return END;
 {DELIMITER} 			return DELIMITER;
+{READ_AND_TRADUCE}		return READ_AND_TRADUCE;
 {INTEGER} 				{yylval.number=atoi(yytext); return INTEGER;}
 {STRING} 				{yylval.string = yytext; return STRING;}
 {TEXT} 					return TEXT;
 {NUMBER} 				return NUMBER;
+{BRAILLE}				return BRAILLE;
 {PLUS} 					return PLUS;
 {MINUS} 				return MINUS;
 {MULTIPLY} 				return MULTIPLY;
@@ -74,6 +78,7 @@ PRINT		"imprimir"
 {FALSE} 				return FALSE;
 {ASSIGN} 				return ASSIGN;
 {PRINT}					return PRINT;
+{NEW_LINE}				return NEW_LINE;
 {VARIABLE} 				{yylval.string = yytext; return VARIABLE;}
 [\n]  					{ yylineno++; ;}
 [ \t]                   ;

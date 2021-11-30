@@ -1,0 +1,18 @@
+inicio
+num aux = 1,
+num aux2 = 3,
+num condicion = 0,
+
+hacer:
+    aux = aux2 * 2,
+    aux2 = aux2 - 1,
+    si (lo contrario a(aux2 es 0)) entonces condicion = 1, terminado
+mientras(condicion es 0),
+
+imprimir "Valor de aux: ",
+imprimir aux,
+imprimir linea,
+imprimir "Valor de aux2: ",
+imprimir aux2,
+imprimir linea,
+fin

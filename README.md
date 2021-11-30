@@ -12,16 +12,8 @@ Autómatas, teoría de lenguajes y compiladores
 ## Como compilar y ejecutar
 
 ```bash
-chmod +x ./install.sh
-./install.sh
-chmod +x ./compile.sh
-./compile.sh test.braille results
-```
+make
 
-De esta manera se va a obtener el ejecutable:
-
-```bash
-./results
 ```
 
 ## Programas de ejemplo
@@ -32,12 +24,10 @@ Se encuentran bajo la carpeta [`examples`](./examples)
 
 * Permite asignar variables de tipo texto:
 ```
-texto [variable] es [valor]
+texto [variable] = [valor]
+num [variable] = [valor]
 ```
-* Permite asignar variables de tipo braille:
-```
-braille [variable] es [valor]
-```
+
 * Permite imprimir por pantalla:
 ```
 print [variable]
