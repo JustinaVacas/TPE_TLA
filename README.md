@@ -16,6 +16,11 @@ make
 ./run.sh ./ejemplos/ejemplo7.braille test
 ./test
 ```
+Si se solicitan permisos:
+```
+chmod u+x tests.sh
+sed -i -e 's/\r$//' tests.sh
+```
 
 ## Programas de ejemplo
 
@@ -49,8 +54,8 @@ imprimir braille [variable],
 ```
 * Permite traducir el texto a braille o al revez, ingresado por entrada estandar:
 ```
-leer y traducir,
-braille_a_texto,
+leer y traducir,     --> Se debe ingresar el texto de la forma: hola
+braille_a_texto,     --> Se debe ingresar el texto de la forma: 234.136.15.1235.2345.15
 ```
 * Permite realizar ciclos while:
 ```
