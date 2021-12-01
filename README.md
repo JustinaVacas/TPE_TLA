@@ -11,15 +11,17 @@ Autómatas, teoría de lenguajes y compiladores
 
 ## Como compilar y ejecutar
 
+Habilitar permisos:
+```
+chmod u+x compile.sh
+sed -i -e 's/\r$//' compile.sh
+chmod u+x tests.sh
+sed -i -e 's/\r$//' tests.sh
+```
 ```bash
 make
 ./run.sh ./ejemplos/ejemplo7.braille test
 ./test
-```
-Si se solicitan permisos:
-```
-chmod u+x tests.sh
-sed -i -e 's/\r$//' tests.sh
 ```
 
 ## Programas de ejemplo
