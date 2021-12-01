@@ -58,8 +58,11 @@
 %token NEW_LINE
 
 %right ASSIGN
+%left AND OR
+%left GREATER LOWER EQUALS NOT_EQUALS
 %left PLUS MINUS
 %left MULTIPLY DIVIDE
+%left NOT
 
 %type<string> definition
 %type<number> type

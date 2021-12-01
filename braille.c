@@ -25,7 +25,7 @@ void print_traduce(char * stdin_braille){
             } 
         }
         if(j == 26){
-            printf("Está mal escrito");
+            printf("Está mal escrito\n");
             return;
         }
         token = strtok(0, ".");

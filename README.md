@@ -20,6 +20,10 @@ make
 ## Programas de ejemplo
 
 Se encuentran bajo la carpeta [`examples`](./examples)
+Se ejecutan haciendo:
+```
+make test
+```
 
 ## Gramática
 

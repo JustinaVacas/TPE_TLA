@@ -1,12 +1,13 @@
 inicio
 
-num aux = 5,
+num aux = 3,
 
 imprimir "Inicio",
 imprimir linea,
 
 hacer: 
     aux = aux - 1,
+    imprimir "Cantidad de pruebas restantes: ",
     imprimir aux,
     imprimir linea,
     leer y traducir,

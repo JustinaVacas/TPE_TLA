@@ -20,8 +20,12 @@ lexing:
 yaccing:
 	yacc $(YACCFLAGS) grammar.y
 
-#CLEAN DIRECTIVES
-clean:
-	rm -rf lex.yy.c y.tab.c y.tab.h $(OBJECT_FILES) braille my_program.c y.output
+test:
+	@echo "Tests del braille compiler:"
+	./tests.sh
+	@echo "Tests done."
 
-.PHONY: all clean
+clean:
+	rm -rf lex.yy.c y.tab.c y.tab.h $(OBJECT_FILES) braille my_program.c y.output ejemplo*.out
+
+.PHONY: all clean test
