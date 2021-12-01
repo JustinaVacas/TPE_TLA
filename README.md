@@ -13,7 +13,8 @@ Autómatas, teoría de lenguajes y compiladores
 
 ```bash
 make
-
+./run.sh ./ejemplos/ejemplo7.braille test
+./test
 ```
 
 ## Programas de ejemplo
@@ -22,17 +23,47 @@ Se encuentran bajo la carpeta [`examples`](./examples)
 
 ## Gramática
 
+* Para que el codigo funcione debe comenzar y terminar con:
+```
+inicio
+//codigo
+fin
+```
 * Permite asignar variables de tipo texto:
 ```
-texto [variable] = [valor]
-num [variable] = [valor]
+texto [variable] = [valor],
+num [variable] = [valor],
 ```
-
 * Permite imprimir por pantalla:
 ```
-print [variable]
+imprimir [variable],
+imprimir [valor],
 ```
-* Permite traducir la palabra sea a texto o a braille:
+* Permite imprimir por pantalla con simbolos braille:
 ```
-traducir [variable]
+imprimir braille [variable],
+```
+* Permite traducir el texto a braille o al revez, ingresado por entrada estandar:
+```
+leer y traducir,
+braille_a_texto,
+```
+* Permite realizar ciclos while:
+```
+hacer:
+ //codigo
+mientras([condicion]),
+```
+* Permite realizar ciclos if:
+```
+si([expresion])
+entonces //codigo 
+terminado
+```
+* Permite realizar operaciones aritmeticas:
+```
+aux = aux + 1,
+aux = aux / 1,
+aux = aux * 1,
+aux = aux - 1,
 ```
