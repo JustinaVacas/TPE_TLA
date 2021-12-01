@@ -1,4 +1,4 @@
-# Trabajo práctico especial
+# Trabajo práctico especial - Braillex
 
 ## Materia
 Autómatas, teoría de lenguajes y compiladores
