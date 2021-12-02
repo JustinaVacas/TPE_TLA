@@ -19,6 +19,7 @@
 %token READ_AND_TRADUCE
 %token BRAILLE_TO_TEXT
 %token TRADUCIR
+%token CONCATENAR
 
 %token TEXT
 %token NUMBER
@@ -70,6 +71,7 @@
 %type<string> definition
 %type<number> type
 %type<number> traduce
+%type<number> concat
 %type<string> var
 
 %start init
@@ -101,7 +103,6 @@ instruction:
 	| printing delimiter_end
 	| read_and_traduce delimiter_end
 	| braille_to_text delimiter_end
-	| traduce delimiter_end
 	;
 
 conditional:
@@ -220,12 +221,25 @@ assignment:
 			yyerror("Variable not exist");
 		};
 	}
+	| definition assign_op concat {
+		struct node * aux = find($1); 
+		if(aux == NULL){
+			fprintf(stderr, "Variable %s doesn't exist.\n", $1);
+			yyerror("Variable not exist"); 
+		} else if ($3 == 2 && aux->type != 2){
+			fprintf(stderr, "Variable %s is not type braille.\n", $1);
+			yyerror("Variable not exist");
+		} else if ($3 == 1 && aux->type != 1){
+			fprintf(stderr, "Variable %s is not type string.\n", $1);
+			yyerror("Variable not exist");
+		};
+	}
 	;
 
 printing:
 	PRINT STRING {printf("printf(%s)", $2);}
 	| PRINT INTEGER {printf("printf(\"%%d\", %d)", $2);}
-	| PRINT T_BRAILLE {printf("prt_braille(%s)", $2);}
+	| PRINT T_BRAILLE {printf("prt_text(%s)", $2);}
 	| PRINT VARIABLE {
 		struct node * aux = find($2);
 		if(aux == NULL){
@@ -236,7 +250,7 @@ printing:
 		} else if (aux->type == 1) {
 			printf("printf(%s)", $2);
 		} else {
-			printf("prt_braille(%s)", $2); 
+			printf("prt_text(%s)", $2); 
 		};
 	}
 	| PRINT BRAILLE STRING {printf("print_braille(%s)", $3);}
@@ -281,6 +295,28 @@ traduce:
 		$$ = aux->type;
 	}
 	;
+
+concat:
+	CONCATENAR VARIABLE VARIABLE {
+		struct node * aux1 = find($2);
+		struct node * aux2 = find($3);
+		if(aux1 == NULL) {
+			fprintf(stderr, "Variable '%s' doesn't exist.\n", $2);
+			yyerror("Variable not exist");
+		} else if(aux2 == NULL) {
+			fprintf(stderr, "Variable '%s' doesn't exist.\n", $3);
+			yyerror("Variable not exist");
+		} else if (aux1->type == 0){
+			fprintf(stderr, "Variable %s is not type string or type braille.\n", $2);
+			yyerror("Variable not exist");
+		} else if (aux2->type == 0){
+			fprintf(stderr, "Variable %s is not type string or type braille.\n", $3);
+			yyerror("Variable not exist");
+		} else {
+			printf("concat(%s, %d, %s, %d)", aux1->variable_name, aux1->type, aux2->variable_name, aux2->type);
+		};
+		$$ = aux1->type;
+	}
 expr:
 	var op_sign expr { 
 		struct node * aux = find($1); 

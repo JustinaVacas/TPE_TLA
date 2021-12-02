@@ -11,6 +11,7 @@ hacer:
     imprimir aux,
     imprimir linea,
     braille_a_texto,
+    imprimir linea,
 mientras(aux>0),
 
 fin

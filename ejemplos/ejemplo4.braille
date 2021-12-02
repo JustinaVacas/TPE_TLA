@@ -7,4 +7,27 @@ imprimir linea,
 texto aux2 = "feliz navidad",
 imprimir braille aux2,
 
+imprimir linea,
+
+texto print = concatenar aux aux2,
+imprimir print,
+imprimir linea,
+
+braille aux3 = 234.136.15.1235.2345.15.,
+texto print2 = concatenar aux aux3,
+imprimir braille print2,
+imprimir linea,
+
+braille print3 = concatenar aux3 aux3,
+imprimir print3,
+imprimir linea,
+imprimir braille print3,
+imprimir linea,
+
+braille print4 = concatenar aux3 aux,
+imprimir print4,
+imprimir linea,
+imprimir braille print4,
+imprimir linea,
+
 fin

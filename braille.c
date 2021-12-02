@@ -14,7 +14,7 @@ int braille_ABC[ALPH] = { 1, 12, 14, 145, 15, 124, 1245, 125, 24, 245, 13, 123, 
 int itoa(int val, char* buf);
 
 char* bra_ABC_to_text(char* braille){
-    char buf[20];
+    char buf[150];
     strcpy(buf, braille);
     char * ans = calloc(strlen(braille), sizeof(char));
     int k = 0;
@@ -38,12 +38,12 @@ char* bra_ABC_to_text(char* braille){
 }
 
 char* text_to_bra_ABC(char* text){
-    char * ans = calloc(strlen(text)*4, sizeof(char));
+    char * ans = calloc(strlen(text)*6, sizeof(char));
     int k = 0;
     for (int i = 0; i < strlen(text); i++) {
             char buff[10] = {0};
             if(text[i] == ' '){
-                ans[k++] = ' ';
+                continue;
             } else if(text[i] >= '0' && text[i] <= '9'){
                 itoa(braille_123[text[i] - '0'], buff);
                 for(int i = 0; i < strlen(buff); i++){
@@ -84,7 +84,6 @@ void print_traduce(char * stdin_braille){
     printf("Braille: %s\n", stdin_braille);
     printf("Palabra: ");
     printf("%s", bra_ABC_to_text(stdin_braille));
-    printf("\n");
 }
 
 void print_braille(char* text){
@@ -95,16 +94,19 @@ void print_braille(char* text){
     for (int i = 0; i < size; i++){
         printf("%s", aux[i]);
     }
-    printf("\n");
 }
 
 
 void prt_braille(char * braille){
     int size = 0;
-    char ** aux = text_to_points(bra_ABC_to_text(braille), &size);
+    char ** aux = text_to_points(traduce(braille, 2), &size);
     for (int i = 0; i < size; i++){
         printf("%s", aux[i]);
     }
+}
+
+void prt_text(char* braille){
+    printf("%s", traduce(braille, 2));
 }
 
 void print_braille_num(int numero){
@@ -184,6 +186,23 @@ char* traduce(char * variable_name, int type){
         return bra_ABC_to_text(variable_name);  
     } else {
         return text_to_bra_ABC(variable_name);
+    }
+}
+
+char * concat(char * var1, int type1, char * var2, int type2){
+    if(type1 == type2){
+        size_t len1 = strlen(var1), len2 = strlen(var2);
+        char *ans = (char*) malloc(len1 + len2 + 1);
+        memcpy(ans, var1, len1);
+        memcpy(ans + len1, var2, len2+1);
+        return ans;
+    } else{
+        char * trad = traduce(var2, type2);
+        size_t len1 = strlen(var1), len2 = strlen(trad);
+        char *ans = (char*) malloc(len1 + len2 + 1);
+        memcpy(ans, var1, len1);
+        memcpy(ans + len1, trad, len2+1);
+        return ans;
     }
 }
 

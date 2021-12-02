@@ -47,6 +47,7 @@ NEW_LINE	"linea"
 READ_AND_TRADUCE "texto_a_braille"
 BRAILLE_TO_TEXT "braille_a_texto"
 TRADUCIR	"traducir"
+CONCATENAR	"concatenar"
 
 
 %%
@@ -86,6 +87,7 @@ TRADUCIR	"traducir"
 {ASSIGN} 				return ASSIGN;
 {PRINT}					return PRINT;
 {TRADUCIR}				return TRADUCIR;
+{CONCATENAR}			return CONCATENAR;
 {NEW_LINE}				return NEW_LINE;
 {VARIABLE} 				{yylval.string = yytext; return VARIABLE;}
 [\n]  					{ yylineno++; ;}
