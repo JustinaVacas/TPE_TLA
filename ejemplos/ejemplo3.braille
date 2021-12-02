@@ -10,7 +10,7 @@ hacer:
     imprimir "Cantidad de pruebas restantes: ",
     imprimir aux,
     imprimir linea,
-    leer y traducir,
+    texto_a_braille,
 mientras(aux>0),
 
 imprimir "Fin",

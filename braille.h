@@ -11,5 +11,7 @@ void print_braille(char * text);
 void print_braille_num(int numero);
 void read_and_traduce();
 void print_traduce(char * stdin_braille);
+void prt_braille(char * braille);
+char * traduce(char * variable_name, int type);
 
 #endif

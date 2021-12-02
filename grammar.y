@@ -18,6 +18,7 @@
 %token DELIMITER
 %token READ_AND_TRADUCE
 %token BRAILLE_TO_TEXT
+%token TRADUCIR
 
 %token TEXT
 %token NUMBER
@@ -25,6 +26,7 @@
 
 %token <string> STRING
 %token <number> INTEGER
+%token <string> T_BRAILLE
 %token <string> VARIABLE
 
 %token MINUS
@@ -67,6 +69,7 @@
 
 %type<string> definition
 %type<number> type
+%type<number> traduce
 %type<string> var
 
 %start init
@@ -96,8 +99,9 @@ instruction:
 	definition delimiter_end
 	| assignment delimiter_end
 	| printing delimiter_end
-	| traducing delimiter_end
+	| read_and_traduce delimiter_end
 	| braille_to_text delimiter_end
+	| traduce delimiter_end
 	;
 
 conditional:
@@ -145,7 +149,7 @@ assignment:
 		if(aux == NULL){
 			fprintf(stderr, "Variable %s doesn't exist.\n", $1);
 			yyerror("Variable not exist"); 
-		} else if (aux->type == 0){
+		} else if (aux->type != 1){
 			fprintf(stderr, "Variable %s is not type string.\n", $1);
 			yyerror("Variable not exist");
 		};
@@ -165,8 +169,54 @@ assignment:
 		if(aux == NULL){
 			fprintf(stderr, "Variable %s doesn't exist.\n", $1);
 			yyerror("Variable not exist"); 
-		} else if (aux->type == 0){
+		} else if (aux->type != 1){
 			fprintf(stderr, "Variable %s is not type string.\n", $1);
+			yyerror("Variable not exist");
+		};
+	}
+	| definition assign_op bra {
+		struct node * aux = find($1); 
+		if(aux == NULL){
+			fprintf(stderr, "Variable %s doesn't exist.\n", $1);
+			yyerror("Variable not exist"); 
+		} else if (aux->type != 2){
+			fprintf(stderr, "Variable %s is not type braille.\n", $1);
+			yyerror("Variable not exist");
+		};
+	}
+	| definition assign_op traduce {
+		struct node * aux = find($1); 
+		if(aux == NULL){
+			fprintf(stderr, "Variable %s doesn't exist.\n", $1);
+			yyerror("Variable not exist"); 
+		} else if ($3 == 2 && aux->type != 1){
+			fprintf(stderr, "Variable %s is not type string.\n", $1);
+			yyerror("Variable not exist");
+		} else if ($3 == 1 && aux->type != 2){
+			fprintf(stderr, "Variable %s is not type braille.\n", $1);
+			yyerror("Variable not exist");
+		};
+	}
+	| var assign_op traduce {
+		struct node * aux = find($1); 
+		if(aux == NULL){
+			fprintf(stderr, "Variable %s doesn't exist.\n", $1);
+			yyerror("Variable not exist"); 
+		} else if ($3 == 2 && aux->type != 2){
+			fprintf(stderr, "Variable %s is not type braille.\n", $1);
+			yyerror("Variable not exist");
+		} else if ($3 == 1 && aux->type != 1){
+			fprintf(stderr, "Variable %s is not type string.\n", $1);
+			yyerror("Variable not exist");
+		};
+	}
+	| var assign_op bra {
+		struct node * aux = find($1); 
+		if(aux == NULL){
+			fprintf(stderr, "Variable %s doesn't exist.\n", $1);
+			yyerror("Variable not exist"); 
+		} else if (aux->type != 2){
+			fprintf(stderr, "Variable %s is not type braille.\n", $1);
 			yyerror("Variable not exist");
 		};
 	}
@@ -175,6 +225,7 @@ assignment:
 printing:
 	PRINT STRING {printf("printf(%s)", $2);}
 	| PRINT INTEGER {printf("printf(\"%%d\", %d)", $2);}
+	| PRINT T_BRAILLE {printf("prt_braille(%s)", $2);}
 	| PRINT VARIABLE {
 		struct node * aux = find($2);
 		if(aux == NULL){
@@ -182,8 +233,11 @@ printing:
 			yyerror("Variable not exist");
 		} else if (aux->type == 0){ 
 			printf("printf(\"%%d\", %s)", $2);
+		} else if (aux->type == 1) {
+			printf("printf(%s)", $2);
 		} else {
-			printf("printf(%s)", $2);};
+			printf("prt_braille(%s)", $2); 
+		};
 	}
 	| PRINT BRAILLE STRING {printf("print_braille(%s)", $3);}
 	| PRINT BRAILLE VARIABLE {
@@ -193,20 +247,40 @@ printing:
 			yyerror("Variable not exist");
 		} else if(aux->type == 1){ 
 			printf("print_braille(%s)", $3);
-		} else{
+		} else if (aux->type == 0){
 			printf("print_braille_num(%s)", $3);
+		}else {
+			printf("prt_braille(%s)", $3); 
 		};
 	}
 	| PRINT BRAILLE INTEGER {printf("print_braille_num(%d)", $3);}
+	| PRINT BRAILLE T_BRAILLE {printf("prt_braille(%s)", $3);}
 	| PRINT NEW_LINE {printf("printf(\"\\n\")");}
 	;
 
-traducing:
+read_and_traduce:
 	READ_AND_TRADUCE {printf("read_and_traduce()");}
+	;
 
 braille_to_text:
 	BRAILLE_TO_TEXT {printf("braille_to_text()");}
+	;
 
+traduce:
+	TRADUCIR VARIABLE {
+		struct node * aux = find($2);
+		if(aux == NULL) {
+			fprintf(stderr, "Variable '%s' doesn't exist.\n", $2);
+			yyerror("Variable not exist");
+		} else if (aux->type == 0){
+			fprintf(stderr, "Variable %s is not type string or type braille.\n", $2);
+			yyerror("Variable not exist");
+		} else {
+			printf("traduce(%s, %d)", aux->variable_name, aux->type);
+		};
+		$$ = aux->type;
+	}
+	;
 expr:
 	var op_sign expr { 
 		struct node * aux = find($1); 
@@ -311,6 +385,7 @@ neq_op:
 
 type: NUMBER {$$ = 0; printf("int ");} 
 	| TEXT {$$ = 1; printf("char *");}
+	| BRAILLE {$$ = 2; printf("char *"); }
 	; 
 
 var:
@@ -331,6 +406,8 @@ int:
 str: 
 	STRING {printf("%s", $1);}
 	;
+bra:
+	T_BRAILLE {printf("%s", $1);}
 %%
 
 void yyerror(char *msg) {

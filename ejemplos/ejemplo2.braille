@@ -6,4 +6,17 @@ imprimir txt,
 imprimir linea,
 imprimir braille txt,
 
+braille aux = 234.136.15.1235.2345.15.,
+texto aux2 = traducir aux,
+imprimir aux2,
+imprimir linea,
+imprimir aux,
+imprimir linea,
+imprimir "Esto es aux2 en braille: ",
+imprimir braille aux2,
+imprimir linea,
+imprimir "Esto es aux en braille: ",
+imprimir braille aux,
+imprimir linea,
+
 fin

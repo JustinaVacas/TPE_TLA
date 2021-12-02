@@ -1,6 +1,7 @@
 %{
 	#include <stdio.h>
 	#include <stdlib.h>
+	#include <string.h>
 	#include "y.tab.h" 
 %}
 
@@ -12,6 +13,7 @@ END 		"fin"
 DELIMITER 	","
 
 INTEGER 	[-]?[0-9]+
+T_BRAILLE   ([0-9]{1,4}[.])*[0-9]{1,4}[.]
 STRING 		["][^\n\r]*["]
 NUMBER 		"num"
 TEXT 		"texto"
@@ -42,8 +44,10 @@ OPEN		"("
 CLOSE		")"
 PRINT		"imprimir"
 NEW_LINE	"linea"
-READ_AND_TRADUCE "leer y traducir"
+READ_AND_TRADUCE "texto_a_braille"
 BRAILLE_TO_TEXT "braille_a_texto"
+TRADUCIR	"traducir"
+
 
 %%
 
@@ -54,6 +58,7 @@ BRAILLE_TO_TEXT "braille_a_texto"
 {BRAILLE_TO_TEXT}		return BRAILLE_TO_TEXT;
 {INTEGER} 				{yylval.number=atoi(yytext); return INTEGER;}
 {STRING} 				{yylval.string = yytext; return STRING;}
+{T_BRAILLE}				{printf("\""); strcat(yytext, "\""); yylval.string = yytext; return T_BRAILLE;}
 {TEXT} 					return TEXT;
 {NUMBER} 				return NUMBER;
 {BRAILLE}				return BRAILLE;
@@ -80,6 +85,7 @@ BRAILLE_TO_TEXT "braille_a_texto"
 {FALSE} 				return FALSE;
 {ASSIGN} 				return ASSIGN;
 {PRINT}					return PRINT;
+{TRADUCIR}				return TRADUCIR;
 {NEW_LINE}				return NEW_LINE;
 {VARIABLE} 				{yylval.string = yytext; return VARIABLE;}
 [\n]  					{ yylineno++; ;}
