@@ -26,6 +26,6 @@ test:
 	@echo "Tests done."
 
 clean:
-	rm -rf lex.yy.c y.tab.c y.tab.h $(OBJECT_FILES) braille my_program.c y.output ejemplo*.out
+	rm -rf lex.yy.c y.tab.c y.tab.h $(OBJECT_FILES) braille my_program.c y.output ejemplo*.out test
 
 .PHONY: all clean test

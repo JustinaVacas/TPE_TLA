@@ -1,5 +1,6 @@
 %{
 	#include <stdio.h>
+	#include <string.h>
 	#include <stdlib.h>
 	#include "list.h"
 	extern int yylineno;
@@ -129,10 +130,46 @@ definition:
 	;
 
 assignment:
-	definition assign_op expr
-	| definition assign_op str
-	| var assign_op expr
-	| var assign_op str
+	definition assign_op expr {
+		struct node * aux = find($1); 
+		if(aux == NULL){
+			fprintf(stderr, "Variable %s doesn't exist.\n", $1);
+			yyerror("Variable not exist"); 
+		} else if (aux->type != 0){
+			fprintf(stderr, "Variable %s is not type int.\n", $1);
+			yyerror("Variable not exist");
+		};
+	}
+	| definition assign_op str {
+		struct node * aux = find($1); 
+		if(aux == NULL){
+			fprintf(stderr, "Variable %s doesn't exist.\n", $1);
+			yyerror("Variable not exist"); 
+		} else if (aux->type == 0){
+			fprintf(stderr, "Variable %s is not type string.\n", $1);
+			yyerror("Variable not exist");
+		};
+	}
+	| var assign_op expr {
+		struct node * aux = find($1); 
+		if(aux == NULL){
+			fprintf(stderr, "Variable %s doesn't exist.\n", $1);
+			yyerror("Variable not exist"); 
+		} else if (aux->type != 0){
+			fprintf(stderr, "Variable %s is not type int.\n", $1);
+			yyerror("Variable not exist");
+		};
+	}
+	| var assign_op str {
+		struct node * aux = find($1); 
+		if(aux == NULL){
+			fprintf(stderr, "Variable %s doesn't exist.\n", $1);
+			yyerror("Variable not exist"); 
+		} else if (aux->type == 0){
+			fprintf(stderr, "Variable %s is not type string.\n", $1);
+			yyerror("Variable not exist");
+		};
+	}
 	;
 
 printing:
@@ -146,7 +183,7 @@ printing:
 		} else if (aux->type == 0){ 
 			printf("printf(\"%%d\", %s)", $2);
 		} else {
-			printf("printf(%s\n)", $2);};
+			printf("printf(%s)", $2);};
 	}
 	| PRINT BRAILLE STRING {printf("print_braille(%s)", $3);}
 	| PRINT BRAILLE VARIABLE {
@@ -171,8 +208,26 @@ braille_to_text:
 	BRAILLE_TO_TEXT {printf("braille_to_text()");}
 
 expr:
-	var op_sign expr
-	| var
+	var op_sign expr { 
+		struct node * aux = find($1); 
+		if(aux == NULL){
+			fprintf(stderr, "Variable %s doesn't exist.\n", $1);
+			yyerror("Variable not exist"); 
+		} else if (aux->type != 0){
+			fprintf(stderr, "Variable %s is not type int.\n", $1);
+			yyerror("Variable not exist");
+		}; 
+	}
+	| var {
+		struct node * aux = find($1); 
+		if(aux == NULL){
+			fprintf(stderr, "Variable %s doesn't exist.\n", $1);
+			yyerror("Variable not exist"); 
+		} else if (aux->type != 0){
+			fprintf(stderr, "Variable %s is not type int.\n", $1);
+			yyerror("Variable not exist");
+		};
+	}
 	| int op_sign expr
 	| int
 	| open_op expr close_op op_sign expr

@@ -8,7 +8,7 @@ struct node *current = NULL;
 
 
 void add(char *key, int type){
-    
+   
     struct node *list = (struct node *)malloc(sizeof(struct node));
 
     int len = strlen(key);
@@ -24,6 +24,8 @@ void add(char *key, int type){
 
 
 struct node *find(char *variable_name){
+
+    char * token = strtok(variable_name, " ,)(+-*/=><");
     
     struct node *current = first;
 
@@ -31,7 +33,7 @@ struct node *find(char *variable_name){
         return NULL;
     }
 
-    while (strcmp(current->variable_name, variable_name) != 0){
+    while (strcmp(current->variable_name, token) != 0){
         if (current->next == NULL){
             return NULL;
         } else{
