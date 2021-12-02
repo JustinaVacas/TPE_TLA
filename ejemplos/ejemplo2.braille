@@ -5,6 +5,13 @@ imprimir "Aux es variable: ",
 imprimir txt,
 imprimir linea,
 imprimir braille txt,
+imprimir linea,
+
+braille ejemplo,
+ejemplo = traducir txt,
+imprimir "txt traducido: ",
+imprimir braille ejemplo,
+imprimir linea,
 
 braille aux = 234.136.15.1235.2345.15.,
 texto aux2 = traducir aux,
