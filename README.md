@@ -54,6 +54,7 @@ fin
 ```
 texto [variable] = [valor],
 num [variable] = [valor],
+braille [variable] = [valor],
 ```
 * Permite imprimir por pantalla:
 ```
@@ -87,4 +88,16 @@ aux = aux + 1,
 aux = aux / 1,
 aux = aux * 1,
 aux = aux - 1,
+```
+* Traducir:
+```
+braille b = 234.136.15.1235.2345.15.,
+texto txt = traducir b,
+```
+
+* Concatenar:
+```
+braille b = 234.136.15.1235.2345.15.,
+texto aux = "feliz navidad",
+texto print = concatenar aux b,
 ```
