@@ -234,6 +234,20 @@ assignment:
 			yyerror("Variable not exist");
 		};
 	}
+	| var assign_op concat {
+		struct node * aux = find($1); 
+		if(aux == NULL){
+			fprintf(stderr, "Variable %s doesn't exist.\n", $1);
+			yyerror("Variable not exist"); 
+		} else if ($3 == 2 && aux->type != 2){
+			fprintf(stderr, "Variable %s is not type braille.\n", $1);
+			yyerror("Variable not exist");
+		} else if ($3 == 1 && aux->type != 1){
+			fprintf(stderr, "Variable %s is not type string.\n", $1);
+			yyerror("Variable not exist");
+		};
+	}
+	;
 	;
 
 printing:
