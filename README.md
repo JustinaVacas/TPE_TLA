@@ -33,11 +33,6 @@ make
 ./compile.sh ./ejemplos/ejemplo7.braille test
 ./test
 ```
-o
-```bash
-make
-make test
-```
 
 ## Programas de ejemplo
 
